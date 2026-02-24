@@ -11,11 +11,13 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://docs.coin.family',
-  baseUrl: '/',
+  url: 'https://coin-agent-exchange.github.io',
+  baseUrl: '/coin-docs/',
+  trailingSlash: false,
 
   organizationName: 'coin-agent-exchange',
   projectName: 'coin-docs',
+  deploymentBranch: 'gh-pages',
 
   onBrokenLinks: 'throw',
 
