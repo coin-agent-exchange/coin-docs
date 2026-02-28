@@ -12,103 +12,87 @@ All repositories are hosted under the [coin-agent-exchange](https://github.com/c
 
 ```
 coin-agent-exchange/
-├── coin-web          # Next.js frontend (Vercel)
-├── coin-convex       # Convex backend (schema, functions, real-time)
-├── coin-escrow       # Solana Anchor escrow program (Rust)
-├── coin-agents       # Agent runtime workers (TypeScript, Railway)
-├── coin-docs         # Documentation site (Docusaurus) ← you are here
-├── coin-prd          # Product docs: PRD, roadmap, ADRs (HTML/PDF)
-└── coinV1-dex        # Architecture reference (dEXploarer's monorepo prototype)
+├── coinV1-dex        # Monorepo — the main codebase (everything lives here)
+└── coin-docs         # Documentation site (Docusaurus, GitHub Pages)
 ```
 
-## coin-web
+## coinV1-dex (Monorepo)
 
 | | |
 |---|---|
-| **Stack** | Next.js 15, Tailwind CSS 4, shadcn/ui, Zustand, React Hook Form + Zod |
-| **Deploys to** | Vercel |
-| **Purpose** | Consumer-facing web application — marketplace, wallet, agent dashboard |
+| **Stack** | Turborepo + Bun, Next.js 15, React 19, Convex, Hono, shadcn/ui, Tailwind 4, Zustand, Zod |
+| **Deploys to** | Vercel (web), Railway (agents + Hono + self-hosted Convex), Solana (escrow) |
+| **Purpose** | The entire Coin platform — web app, admin dashboard, backend, agents, escrow, shared packages |
 
-The frontend connects to Convex for real-time data and to the Solana network (via Privy) for wallet operations.
-
-## coin-convex
-
-| | |
-|---|---|
-| **Stack** | Convex (TypeScript), Zod validators |
-| **Deploys to** | Convex Cloud (MVP) → Self-hosted on Railway (V1) |
-| **Purpose** | Primary backend — database schema, queries, mutations, actions, cron jobs |
-
-Organized by domain following the vertical slice pattern:
+### Monorepo Structure
 
 ```
-convex/
-  functions/
-    offers/queries.ts      # getOffers, getOffersByToken
-    offers/mutations.ts    # createOffer, cancelOffer, acceptOffer
-    offers/actions.ts      # settleOnChain, syncEscrowStatus
-    agents/queries.ts      # getAgents, getAgentPerformance
-    prices/queries.ts      # getLatestPrices, getPriceHistory
-  schema.ts
-  crons.ts
-  http.ts
+coinV1-dex/
+├── apps/
+│   ├── web/                    # Consumer web app (Next.js 15, React 19)
+│   ├── admin/                  # Admin dashboard (Next.js 15)
+│   ├── desktop/                # Desktop app (Electron)
+│   └── docs/                   # API docs (Mintlify)
+│
+├── packages/core/
+│   ├── ui/                     # Design system (shadcn/ui + Radix, 40+ components)
+│   ├── types/                  # Shared TypeScript types (all domains)
+│   ├── utils/                  # Utility functions (formatting, calculations, crypto)
+│   ├── validators/             # Zod validation schemas
+│   └── analytics/              # Analytics client (Mixpanel + Sentry)
+│
+├── packages/config/
+│   ├── tailwind/               # Shared Tailwind config
+│   └── typescript/             # Shared TSConfig
+│
+├── services/
+│   ├── convex/                 # Convex backend (55+ tables, domain-organized functions)
+│   ├── trading-engine/         # Trading service (Hono, order matching)
+│   ├── payment-processor/      # Payment service (Hono, Stripe)
+│   └── notification-service/   # Notification service (Hono, Resend, Firebase)
+│
+├── infrastructure/
+│   ├── docker/                 # Docker Compose for local dev
+│   ├── pulumi/                 # IaC config
+│   └── scripts/                # Deploy scripts
+│
+└── .github/workflows/          # CI/CD (lint, typecheck, test, deploy)
 ```
 
-## coin-escrow
+### Key Components
 
-| | |
-|---|---|
-| **Stack** | Anchor (Rust), Solana Web3.js |
-| **Deploys to** | Solana Devnet (testing) → Mainnet (production) |
-| **Purpose** | On-chain escrow program for trade settlement |
+**Web App** (`apps/web`) — Consumer-facing Next.js 15 application with 20+ feature modules including marketplace, crypto trading, wallet management, and settings. Uses Privy for auth + embedded Solana wallets.
 
-Implements the two-phase commit pattern:
+**Admin Dashboard** (`apps/admin`) — Internal admin interface with user management, KYC compliance, support tickets, audit logs, and transaction monitoring.
+
+**Convex Backend** (`services/convex`) — Primary data layer with 55+ tables covering all domains. Functions organized by domain (queries.ts / mutations.ts / actions.ts per feature). Real-time subscriptions for marketplace feed and live updates.
+
+**Hono Services** (`services/`) — Companion compute layer for webhooks, admin API, WebSocket fan-out, and workloads that don't fit Convex's serverless model. Per [ADR-001b](/architecture/adr-001#backend), these run as a thin layer alongside Convex — not as independent microservices.
+
+**Shared Packages** (`packages/core/`) — Design system (40+ components), TypeScript types, Zod validators, utility functions, and analytics client. Shared across web, admin, and services.
+
+**Escrow Program** — Solana Anchor program for on-chain trade settlement. Implements the two-phase commit pattern:
 - `create_offer` — Seller locks tokens in PDA escrow account
 - `accept_offer` — Buyer sends payment, escrow releases tokens atomically
 - `cancel_offer` — Seller can cancel and reclaim tokens if not yet accepted
 
-## coin-agents
+### Tooling
 
-| | |
-|---|---|
-| **Stack** | TypeScript, Node.js, Solana Web3.js, Anchor client, Hono |
-| **Deploys to** | Railway |
-| **Purpose** | Agent runtime workers — AI market makers that post offers, accept offers, and earn spread |
-
-Agent behavior:
-1. Subscribe to Jupiter WebSocket for real-time price feeds
-2. Subscribe to Convex for new offers from other agents/humans
-3. Post buy/sell offers at configurable spread below Jupiter price
-4. Auto-accept counterparty offers within threshold
-5. Enforce daily spending cap + per-trade limits
-
-The Hono server layer handles webhook receivers, health checks, and admin API.
-
-## coin-prd
-
-| | |
-|---|---|
-| **Stack** | HTML, CSS, Puppeteer (PDF generation) |
-| **Purpose** | Product documentation — PRD v2, roadmap, ADR-001 as styled HTML + generated PDFs |
-
-Files:
-- `src/prd-v2.html` — Full PRD with wireframes and Mermaid diagrams
-- `src/roadmap.html` — Product roadmap with Gantt charts
-- `src/adr-001.html` — Architecture Decision Record
-- `output/*.pdf` — Generated PDFs for sharing
+| Tool | Purpose |
+|------|---------|
+| **Turborepo** | Monorepo task pipeline (build, lint, typecheck, test) |
+| **Bun** | Package manager (fast installs, workspaces) |
+| **Biome** | Linting + formatting |
+| **Vitest** | Testing framework |
+| **GitHub Actions** | CI/CD pipelines |
 
 ## coin-docs
 
 | | |
 |---|---|
 | **Stack** | Docusaurus 3, TypeScript |
-| **Purpose** | This documentation site |
+| **Deploys to** | GitHub Pages (auto-deploy on push to main) |
+| **Purpose** | This documentation site — PRD, roadmap, ADRs, engineering guides |
+| **URL** | [coin-agent-exchange.github.io/coin-docs](https://coin-agent-exchange.github.io/coin-docs/) |
 
-## coinV1-dex
-
-| | |
-|---|---|
-| **Stack** | Turborepo monorepo, Next.js 15, Convex, Hono, shadcn/ui |
-| **Purpose** | dEXploarer's architecture reference implementation — full-stack fintech prototype |
-
-This is a comprehensive monorepo with 577 files implementing the Architecture Blueprint. It includes a web app (20+ feature modules), admin dashboard, desktop app, 3 microservices, shared UI library, and 55+ Convex schema tables. Used as an **architecture reference** — patterns and components can be cherry-picked into the production repos.
+Also hosts the styled HTML and PDF versions of product documents in the `/static/html/` and `/static/pdf/` directories.

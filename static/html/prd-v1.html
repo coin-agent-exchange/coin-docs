@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coin — Product Requirements Document v1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#DBEAFE',
+        primaryTextColor: '#111827',
+        primaryBorderColor: '#2563EB',
+        lineColor: '#2563EB',
+        secondaryColor: '#F9FAFB',
+        tertiaryColor: '#DBEAFE'
+      }
+    });
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #111827;
+      background: #FFFFFF;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+    /* Cover */
+    .cover {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; text-align: center; padding: 80px 24px;
+    }
+    .cover-logo { font-size: 72px; font-weight: 700; color: #2563EB; letter-spacing: -2px; margin-bottom: 24px; }
+    .cover-subtitle { font-size: 24px; font-weight: 500; color: #111827; margin-bottom: 12px; }
+    .cover-url { font-size: 18px; color: #6B7280; margin-bottom: 8px; }
+    .cover-date { font-size: 16px; color: #6B7280; margin-bottom: 80px; }
+    .cover-confidential {
+      font-size: 13px; font-weight: 600; color: #6B7280; text-transform: uppercase;
+      letter-spacing: 2px; border-top: 1px solid #E5E7EB; padding-top: 24px;
+    }
+
+    /* Typography */
+    h1 { font-size: 28px; font-weight: 700; color: #111827; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 3px solid #2563EB; }
+    h2 { font-size: 22px; font-weight: 700; color: #111827; margin-top: 40px; margin-bottom: 16px; }
+    h3 { font-size: 18px; font-weight: 600; color: #1E40AF; margin-top: 32px; margin-bottom: 12px; }
+    h4 { font-size: 16px; font-weight: 600; color: #111827; margin-top: 24px; margin-bottom: 8px; }
+    p { margin-bottom: 16px; }
+    ul, ol { margin-bottom: 16px; padding-left: 24px; }
+    li { margin-bottom: 6px; }
+    a { color: #2563EB; text-decoration: none; }
+    a:hover { color: #1E40AF; text-decoration: underline; }
+    code { background: #F3F4F6; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', 'Fira Code', monospace; }
+    hr { border: none; border-top: 1px solid #E5E7EB; margin: 48px 0; }
+    strong { font-weight: 600; }
+
+    /* Sections */
+    .section { padding: 48px 0; }
+    .page-break { page-break-before: always; }
+
+    /* TOC */
+    .toc { padding: 48px 0; }
+    .toc ol { list-style: none; counter-reset: toc; padding: 0; }
+    .toc > ol > li { counter-increment: toc; margin-bottom: 10px; }
+    .toc > ol > li > a { font-size: 16px; font-weight: 500; display: flex; align-items: baseline; gap: 10px; }
+    .toc > ol > li > a::before { content: counter(toc) "."; color: #2563EB; font-weight: 700; min-width: 28px; }
+    .toc > ol > li > ol { list-style: none; padding-left: 38px; margin-top: 6px; }
+    .toc > ol > li > ol > li { margin-bottom: 4px; }
+    .toc > ol > li > ol > li > a { font-size: 14px; color: #6B7280; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+    thead th { background: #2563EB; color: #FFFFFF; font-weight: 600; padding: 12px 16px; text-align: left; }
+    thead th:first-child { border-top-left-radius: 8px; }
+    thead th:last-child { border-top-right-radius: 8px; }
+    tbody td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+    tbody tr:nth-child(even) { background: #F9FAFB; }
+
+    /* Callout */
+    .callout { background: #DBEAFE; border-left: 4px solid #2563EB; border-radius: 0 8px 8px 0; padding: 20px 24px; margin: 24px 0; }
+    .callout p { margin-bottom: 8px; }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout-warning { background: #FEF3C7; border-left-color: #D97706; }
+    .callout-danger { background: #FEE2E2; border-left-color: #DC2626; }
+
+    /* Out of scope box */
+    .out-of-scope { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; padding: 24px 28px; margin: 24px 0; }
+    .out-of-scope-item { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; font-size: 14px; }
+    .out-of-scope-item:last-child { margin-bottom: 0; }
+    .oos-x { color: #DC2626; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+
+    /* Severity badges */
+    .sev-high { background: #FEE2E2; color: #991B1B; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .sev-med { background: #FEF3C7; color: #92400E; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .sev-low { background: #D1FAE5; color: #065F46; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+    /* Mermaid */
+    .mermaid { margin: 32px 0; text-align: center; }
+    .diagram-caption { text-align: center; font-size: 13px; color: #6B7280; margin-top: 8px; font-style: italic; }
+
+    /* Wireframe phone frame */
+    .wireframe-row { display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; margin: 32px 0; }
+    .phone-frame {
+      width: 375px; min-height: 667px; background: #FFFFFF; border: 2px solid #1F2937;
+      border-radius: 36px; padding: 48px 16px 32px; position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12); flex-shrink: 0;
+    }
+    .phone-frame::before {
+      content: ''; position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 24px; background: #1F2937; border-radius: 12px;
+    }
+    .phone-screen { height: 100%; overflow: hidden; font-size: 14px; line-height: 1.5; }
+    .phone-screen * { margin: 0; }
+
+    /* Wireframe internal styles */
+    .wf-header { text-align: center; padding: 16px 0 12px; border-bottom: 1px solid #E5E7EB; margin-bottom: 16px; }
+    .wf-logo { font-size: 28px; font-weight: 700; color: #2563EB; }
+    .wf-tagline { font-size: 12px; color: #6B7280; margin-top: 4px; }
+    .wf-btn {
+      display: block; width: 100%; padding: 14px; border-radius: 12px; text-align: center;
+      font-weight: 600; font-size: 15px; border: none; cursor: pointer; margin-bottom: 12px;
+    }
+    .wf-btn-primary { background: #2563EB; color: #FFFFFF; }
+    .wf-btn-secondary { background: #F3F4F6; color: #111827; }
+    .wf-btn-outline { background: transparent; border: 2px solid #2563EB; color: #2563EB; }
+    .wf-input {
+      width: 100%; padding: 12px 14px; border: 1px solid #D1D5DB; border-radius: 10px;
+      font-size: 14px; margin-bottom: 12px; background: #F9FAFB;
+    }
+    .wf-label { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px; display: block; }
+    .wf-card {
+      background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 12px;
+      padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .wf-nav {
+      display: flex; justify-content: space-around; border-top: 1px solid #E5E7EB;
+      padding: 10px 0 0; margin-top: auto; position: absolute; bottom: 32px; left: 16px; right: 16px;
+    }
+    .wf-nav-item { text-align: center; font-size: 10px; color: #6B7280; }
+    .wf-nav-item.active { color: #2563EB; font-weight: 600; }
+    .wf-nav-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+    .wf-section-title { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 12px; }
+    .wf-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 10px;
+      font-weight: 600; vertical-align: middle;
+    }
+    .wf-badge-agent { background: #DBEAFE; color: #1E40AF; }
+    .wf-badge-human { background: #D1FAE5; color: #065F46; }
+    .wf-badge-tier { background: #EDE9FE; color: #5B21B6; }
+    .wf-spread-good { color: #059669; font-weight: 600; font-size: 12px; }
+    .wf-spread-bad { color: #DC2626; font-weight: 600; font-size: 12px; }
+    .wf-tab-row { display: flex; gap: 0; margin-bottom: 12px; border-bottom: 2px solid #E5E7EB; }
+    .wf-tab { padding: 8px 14px; font-size: 12px; font-weight: 500; color: #6B7280; cursor: pointer; }
+    .wf-tab.active { color: #2563EB; border-bottom: 2px solid #2563EB; margin-bottom: -2px; font-weight: 600; }
+    .wf-price-ref { background: #F9FAFB; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #6B7280; margin-bottom: 12px; text-align: center; }
+    .wf-divider { border: none; border-top: 1px solid #E5E7EB; margin: 12px 0; }
+    .wf-stat { text-align: center; }
+    .wf-stat-value { font-size: 20px; font-weight: 700; color: #2563EB; }
+    .wf-stat-label { font-size: 10px; color: #6B7280; }
+    .wf-toggle-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .wf-toggle { flex: 1; padding: 10px; border-radius: 10px; text-align: center; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .wf-toggle.active { background: #2563EB; color: #FFF; }
+    .wf-toggle.inactive { background: #F3F4F6; color: #6B7280; }
+    .wf-check-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+    .wf-checkbox { width: 18px; height: 18px; border: 2px solid #D1D5DB; border-radius: 4px; flex-shrink: 0; }
+    .wf-checkbox.checked { background: #2563EB; border-color: #2563EB; position: relative; }
+    .wf-checkbox.checked::after { content: '✓'; color: white; font-size: 12px; position: absolute; top: -1px; left: 3px; }
+    .wf-wallet-section { background: #F9FAFB; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .wf-wallet-title { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px; }
+    .wf-token-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; }
+    .wf-token-name { font-weight: 500; }
+    .wf-token-bal { color: #6B7280; }
+    .wf-small-btn { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; }
+
+    /* Print */
+    @media print {
+      body { font-size: 12px; }
+      .cover { min-height: auto; padding: 140px 24px; page-break-after: always; }
+      .toc { page-break-after: always; }
+      .page-break { page-break-before: always; }
+      h1, h2, h3 { page-break-after: avoid; }
+      table, .callout, .out-of-scope { page-break-inside: avoid; }
+      .mermaid { page-break-inside: avoid; }
+      .phone-frame { box-shadow: none; border: 1px solid #D1D5DB; page-break-inside: avoid; }
+      .wireframe-row { page-break-inside: avoid; }
+      a { color: #2563EB; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- COVER PAGE -->
+<!-- ============================================================ -->
+<div class="cover">
+  <div class="cover-logo">COIN</div>
+  <div class="cover-subtitle">Product Requirements Document — v1</div>
+  <div class="cover-url">coin.family</div>
+  <div class="cover-date">February 2026</div>
+  <div class="cover-confidential">Confidential — Internal Use Only</div>
+</div>
+
+<div class="container">
+
+<!-- ============================================================ -->
+<!-- TABLE OF CONTENTS -->
+<!-- ============================================================ -->
+<div class="toc page-break">
+  <h1>Table of Contents</h1>
+  <ol>
+    <li><a href="#executive-summary">Executive Summary</a></li>
+    <li><a href="#problem-statement">Problem Statement</a></li>
+    <li><a href="#solution-overview">Solution Overview</a></li>
+    <li><a href="#target-users">Target Users</a>
+      <ol>
+        <li><a href="#u-agent-ops">AI Agent Operators</a></li>
+        <li><a href="#u-traders">Crypto-Native Traders on Base</a></li>
+        <li><a href="#u-otc">OTC Traders</a></li>
+        <li><a href="#u-consumer">Non-Technical Users (Post-V1)</a></li>
+      </ol>
+    </li>
+    <li><a href="#v1-features">V1 MVP Feature Specification</a>
+      <ol>
+        <li><a href="#f-offers">Offer System</a></li>
+        <li><a href="#f-escrow">Escrow-Based Settlement</a></li>
+        <li><a href="#f-agents">Coin-Operated Market Making Agents</a></li>
+        <li><a href="#f-identity">Identity &amp; Onboarding</a></li>
+        <li><a href="#f-wallets">Wallet Infrastructure</a></li>
+        <li><a href="#f-reputation">Reputation System</a></li>
+        <li><a href="#f-agentconfig">Agent Configuration</a></li>
+        <li><a href="#f-privacy">Privacy</a></li>
+        <li><a href="#f-platform">Platform</a></li>
+        <li><a href="#f-revenue">Revenue Collection</a></li>
+      </ol>
+    </li>
+    <li><a href="#out-of-scope">V1 Explicitly Out of Scope</a></li>
+    <li><a href="#architecture">System Architecture</a>
+      <ol>
+        <li><a href="#a-highlevel">High-Level Architecture</a></li>
+        <li><a href="#a-onboarding">Onboarding Flow</a></li>
+        <li><a href="#a-settlement">Trade Settlement Flow</a></li>
+        <li><a href="#a-market-making">Agent Market Making Flow</a></li>
+        <li><a href="#a-dual-profile">Dual Profile &amp; Wallet Model</a></li>
+      </ol>
+    </li>
+    <li><a href="#wireframes">Wireframes</a></li>
+    <li><a href="#timeline">Development Timeline</a></li>
+    <li><a href="#success-metrics">Success Metrics</a></li>
+    <li><a href="#risks">Risks &amp; Mitigations</a></li>
+    <li><a href="#open-questions">Open Questions</a></li>
+    <li><a href="#references">References</a></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<!-- 1. EXECUTIVE SUMMARY -->
+<!-- ============================================================ -->
+<div class="section page-break" id="executive-summary">
+  <h1>1. Executive Summary</h1>
+
+  <p>Coin is a peer-to-peer token exchange built on Base where AI agents and humans buy and sell crypto tokens directly with each other. Unlike decentralized exchanges (DEXs) that rely on automated market maker (AMM) pools, Coin enables counterparties to find each other, negotiate exact prices, and settle trades atomically through smart contract escrow. The result is zero slippage, zero MEV extraction, and fixed-price execution for every trade — regardless of size.</p>
+
+  <p>The core thesis behind Coin is that AI agents are structurally better market makers than AMM liquidity pools. They run 24/7, quote tighter spreads, dynamically adjust pricing based on real-time market conditions, and never suffer from impermanent loss. Coin provides the venue where these agents operate as always-on liquidity providers, serving human traders who want better execution than DEXs can offer. The exchange supports four transaction types — Agent-to-Agent, Agent-to-Human, Human-to-Agent, and Human-to-Human — treating AI agents as first-class market participants.</p>
+
+  <p>Coin is built entirely on production-grade infrastructure from the Coinbase and Base ecosystem: Coinbase Agentic Wallets for agent custody, CDP wallets with MPC key management for humans, the x402 payment protocol for agent-to-agent settlement, ERC-8004 for on-chain agent identity, and Basenames for human-readable addresses. Authentication is handled by Privy (social login via X), while wallet provisioning is completely separate via Coinbase CDP APIs.</p>
+
+  <p>This document specifies the v1 MVP: an escrow-based P2P token exchange with a web-first interface, supporting six initial token pairs on Base. Coin-operated market-making agents bootstrap day-one liquidity by undercutting Aerodrome DEX prices. A weighted reputation system combining trade history, volume, social verification, and counterparty ratings builds trust between participants. The target is public launch approximately three months from the start of development, with $50K+ daily gross merchandise volume and 100+ active human traders at launch.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- 2. PROBLEM STATEMENT -->
+<!-- ============================================================ -->
+<div class="section page-break" id="problem-statement">
+  <h1>2. Problem Statement</h1>
+
+  <h3>DEX Slippage Destroys Value at Scale</h3>
+  <p>Every trade on an AMM-based DEX incurs price impact proportional to trade size relative to pool liquidity. A $10,000 swap on a mid-liquidity Aerodrome pool typically loses 0.5–2% to slippage — that's $50 to $200 evaporated per trade. Across the DeFi ecosystem, slippage costs exceeded an estimated $2.7 billion in 2024. For traders executing block-sized orders ($10K+), the cost of AMM pricing is not a minor inconvenience — it is a structural tax on every transaction.</p>
+
+  <h3>MEV Extraction Steals From Every DEX Trader</h3>
+  <p>Sandwich attacks, front-running, and back-running are endemic to DEX trading. MEV bots monitor the mempool, detect pending swaps, and extract value by manipulating execution prices. Traders on Uniswap, Aerodrome, and other AMMs are systematically exploited — often without realizing it. The MEV supply chain has grown into a multi-billion-dollar extraction industry that operates entirely at the expense of retail and institutional traders alike. P2P trading eliminates MEV entirely because trades settle directly between counterparties with pre-agreed prices.</p>
+
+  <h3>No Price Negotiation on AMMs</h3>
+  <p>AMMs give traders whatever price the bonding curve dictates at the moment of execution. There is no mechanism to set a specific price, negotiate terms, or lock in a rate before execution. For traders who need price certainty — whether for accounting, portfolio rebalancing, or large block trades — AMMs are fundamentally unsuitable. P2P offers with fixed prices solve this directly.</p>
+
+  <h3>No Reputation or Counterparty Trust</h3>
+  <p>DEX trades are anonymous by nature. There is no reputation system, no counterparty history, and no mechanism to build trust over repeated interactions. Every trade is a one-shot anonymous exchange with a liquidity pool. P2P exchange enables reputation accumulation: traders and agents build verifiable track records through completed trades, counterparty ratings, and social verification — creating a trust layer that makes repeated trading more efficient.</p>
+
+  <h3>Existing P2P Exchanges Do Not Serve This Market</h3>
+  <p>Binance P2P, Paxful, and similar platforms are designed for fiat-to-crypto conversion. They require KYC, operate through centralized custodians, do not support AI agent participants, and do not settle on-chain. No existing P2P exchange is built for on-chain token-to-token trading with AI agents as first-class market makers. The market gap is clear.</p>
+
+  <h3>AI Agents Have No P2P Venue</h3>
+  <p>AI agents are already actively trading tokens on Base — executing swaps, managing portfolios, and providing liquidity. But they are forced to use DEXs for every transaction, suffering the same slippage and MEV costs as human traders. These agents are natural market makers: they can monitor prices continuously, post competitive offers, and settle instantly. What they lack is a dedicated P2P venue that treats them as first-class participants with on-chain identity, reputation, and structured offer systems.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- 3. SOLUTION OVERVIEW -->
+<!-- ============================================================ -->
+<div class="section page-break" id="solution-overview">
+  <h1>3. Solution Overview</h1>
+
+  <p>Coin is a P2P token exchange on Base where sellers post offers and buyers take them. Settlement occurs through smart contract escrow — both parties' tokens are locked, verified, and exchanged atomically on-chain. No intermediary holds funds. No AMM determines the price. Counterparties agree on exact terms before any tokens move.</p>
+
+  <h3>AI Agents as First-Class Market Makers</h3>
+  <p>AI agents participate on Coin with their own wallets (Coinbase Agentic Wallets), their own on-chain identities (ERC-8004 identity NFTs bound to Basenames), and their own reputation scores. Agents post offers, accept trades, monitor prices, and manage inventory — autonomously and around the clock. They serve as always-on liquidity providers, offering human traders tighter spreads than AMM pools can provide.</p>
+
+  <h3>Four Transaction Types</h3>
+  <div class="callout">
+    <p><strong>Agent ↔ Agent:</strong> High-frequency automated trading between market-making agents. Settlement via x402 micropayments or standard escrow.</p>
+    <p><strong>Agent ↔ Human:</strong> Agent sells tokens to a human buyer at a competitive price. The most common transaction type at launch.</p>
+    <p><strong>Human ↔ Agent:</strong> Human sells tokens to an agent buyer. Agents provide buy-side liquidity for humans looking to exit positions.</p>
+    <p><strong>Human ↔ Human:</strong> Traditional P2P trade between two human users. Less frequent at launch but important for OTC block trades.</p>
+  </div>
+
+  <h3>Identity and Trust</h3>
+  <p>Every participant has a Basename (human-readable on-chain identity). Agents are additionally registered via ERC-8004, which mints an identity NFT that binds the agent to its operator's Basename. Social verification via X (Twitter) adds a real-world trust signal. The combination of trade history, volume, social verification, and counterparty ratings produces a composite reputation score displayed on every offer and profile.</p>
+
+  <h3>Economics</h3>
+  <p>Coin charges a 0.5% exchange fee on every settled trade, split evenly between buyer (0.25%) and seller (0.25%). Base L2 gas costs are sub-cent. Agents earn revenue through the spread between their buy and sell prices. The exchange provides the venue, the identity infrastructure, and the escrow settlement — agents and humans provide the liquidity and the demand.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- 4. TARGET USERS -->
+<!-- ============================================================ -->
+<div class="section page-break" id="target-users">
+  <h1>4. Target Users</h1>
+
+  <h2 id="u-agent-ops">4.1 Primary: AI Agent Operators</h2>
+  <p>People and teams who deploy and manage autonomous trading agents on Base. They want their agents to earn revenue through market making — capturing the spread between buy and sell prices across token pairs. Today, these operators are building agents that trade on DEXs, but they face slippage, MEV, and unpredictable execution. Coin gives their agents a structured P2P venue to post offers, build reputation, and earn consistent spreads against human counterparties. Agent operators are the supply side of the marketplace.</p>
+
+  <h2 id="u-traders">4.2 Primary: Crypto-Native Traders on Base</h2>
+  <p>Active traders who regularly use Aerodrome, Uniswap, and other Base DEXs. They hold positions in ETH, USDC, AERO, and other Base tokens. They understand on-chain trading and are frustrated by slippage on larger orders, MEV extraction, and the inability to set fixed prices. They will use Coin when agents offer better execution than DEXs — which Coin-operated agents are designed to do from day one. These traders are the demand side of the marketplace.</p>
+
+  <h2 id="u-otc">4.3 Secondary: OTC Traders</h2>
+  <p>Traders executing block-sized orders ($10K+) who currently suffer significant price impact on DEXs. A $50K ETH sale on Aerodrome can lose 1-3% to slippage — that's $500 to $1,500 gone. P2P offers on Coin give them fixed-price execution regardless of order size, with atomic settlement that eliminates counterparty risk. OTC traders are high-value but lower frequency — each trade contributes outsized volume.</p>
+
+  <h2 id="u-consumer">4.4 Tertiary (Post-V1): Non-Technical Users</h2>
+  <p>The long-term consumer vision is users who want to "own an agent" that earns for them passively — like owning a vending machine that trades tokens 24/7. These users don't want to configure strategies or manage wallets manually. They want to fund an agent, set basic parameters (risk level, daily cap), and collect returns. This user segment is explicitly <strong>not in v1 scope</strong> but informs the product direction for v2 and beyond.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- 5. V1 MVP FEATURE SPECIFICATION -->
+<!-- ============================================================ -->
+<div class="section page-break" id="v1-features">
+  <h1>5. V1 MVP Feature Specification</h1>
+
+  <h2 id="f-offers">5.1 Offer System</h2>
+
+  <h4>Post Offer</h4>
+  <p>A seller creates an offer by specifying: the token for sale, the quantity available, the price denominated in USDC (or another supported quote token), an expiration time, and an optional minimum trade size. Offers are stored in the backend database and referenced on-chain. The seller's tokens are pre-locked in escrow when the offer is posted, ensuring that every listed offer is fully backed.</p>
+
+  <h4>Browse Offers</h4>
+  <p>Buyers see all active offers in a scrollable feed. Offers can be filtered by: token pair (e.g., ETH/USDC), price range, seller reputation score, seller type (agent or human), and verification tier. The feed is sorted by price competitiveness by default, with the best spreads relative to Aerodrome appearing first.</p>
+
+  <h4>Offer Matching</h4>
+  <p>There is no automatic order book matching in v1. A buyer manually browses offers, selects one, and initiates a trade. This deliberate simplicity keeps the v1 system easier to build, test, and debug. Automatic matching is a v2 feature.</p>
+
+  <h4>Supported Tokens (V1)</h4>
+  <table>
+    <thead><tr><th>Token</th><th>Type</th><th>Rationale</th></tr></thead>
+    <tbody>
+      <tr><td><code>USDC</code></td><td>Stablecoin</td><td>Primary quote currency for all pairs</td></tr>
+      <tr><td><code>USDT</code></td><td>Stablecoin</td><td>Secondary stablecoin, high volume on Base</td></tr>
+      <tr><td><code>ETH</code></td><td>Native / Wrapped</td><td>Highest-volume asset on Base</td></tr>
+      <tr><td><code>AERO</code></td><td>Governance</td><td>Aerodrome token, top Base DEX native asset</td></tr>
+      <tr><td><code>cbETH</code></td><td>LST</td><td>Coinbase staked ETH, significant Base liquidity</td></tr>
+      <tr><td><code>wstETH</code></td><td>LST</td><td>Lido wrapped staked ETH, institutional demand</td></tr>
+    </tbody>
+  </table>
+  <p>Additional tokens are added post-launch based on trading volume and liquidity thresholds determined by the team.</p>
+
+  <h4>Price Reference</h4>
+  <p>Every offer displays the current Aerodrome pool price for the same token pair alongside the seller's asking price. This allows buyers to immediately see whether the P2P offer is better or worse than what they would get on the DEX — expressed as a percentage spread (e.g., "0.08% better than Aerodrome").</p>
+
+  <h2 id="f-escrow">5.2 Escrow-Based Settlement</h2>
+
+  <p>When a buyer initiates a trade by selecting an offer, both parties' tokens are locked in a smart contract escrow deployed on Base. Settlement is <strong>atomic</strong>: both sides receive their tokens simultaneously, or the entire transaction reverts. There is no scenario where one party receives tokens and the other does not.</p>
+
+  <ul>
+    <li><strong>Escrow funding:</strong> The seller's tokens are pre-locked when the offer is posted. The buyer funds their side when they initiate the trade.</li>
+    <li><strong>Timeout:</strong> If the buyer does not fund within the configured timeout (5 minutes for agent counterparties, 30 minutes for human counterparties), the trade cancels automatically and the seller's tokens are released back.</li>
+    <li><strong>Settlement speed:</strong> Base L2 provides sub-second finality. Typical trade settlement completes in under 10 seconds including on-chain confirmation.</li>
+    <li><strong>Gas costs:</strong> Base transaction fees are consistently under $0.01, making escrow economically viable even for small trades.</li>
+    <li><strong>Exchange fee:</strong> 0.5% of trade value is deducted at settlement — 0.25% from the buyer, 0.25% from the seller — and sent to the project treasury wallet.</li>
+  </ul>
+
+  <h2 id="f-agents">5.3 Coin-Operated Market Making Agents (Cold Start)</h2>
+
+  <p>The cold-start problem is the single largest risk for any marketplace: without sellers, there are no buyers, and without buyers, there are no sellers. Coin solves this by deploying its own fleet of market-making agents at launch.</p>
+
+  <ul>
+    <li><strong>Fleet size:</strong> 10-20 Coin-operated agents deployed at launch, each with its own Agentic Wallet and Basename identity.</li>
+    <li><strong>Coverage:</strong> Agents quote all supported token pairs (ETH/USDC, AERO/USDC, cbETH/USDC, wstETH/USDC, ETH/USDT, USDC/USDT).</li>
+    <li><strong>Pricing strategy:</strong> Agents peg to the real-time Aerodrome pool price and apply a 0.05–0.10% discount. A buyer comparing Aerodrome to Coin will see a consistently better price on Coin.</li>
+    <li><strong>Volume seeding:</strong> Agents trade with each other to create visible transaction history, demonstrating that the exchange is active and settlement works.</li>
+    <li><strong>Transition plan:</strong> As third-party agents and human traders join, Coin-operated agents are gradually scaled down. The long-term goal is a marketplace where the majority of liquidity is provided by independent participants.</li>
+  </ul>
+
+  <h2 id="f-identity">5.4 Identity & Onboarding</h2>
+
+  <h4>Authentication</h4>
+  <p>Privy handles authentication via social login with X (Twitter). Privy manages session tokens (JWT), account linking, and session persistence. Privy is the <strong>auth layer only</strong> — it does not provision wallets or manage keys.</p>
+
+  <h4>Basename Registration</h4>
+  <p>Every user registers a Basename (e.g., <code>alice.base.eth</code>) during onboarding. Users who already own a Basename can link their existing one. The Basename serves as the user's human-readable on-chain identity across the platform.</p>
+
+  <h4>Social Verification</h4>
+  <p>Users link their X (Twitter) account during onboarding. The X account age, follower count, and verification status contribute to the social component (S) of the reputation formula. V1 supports X only — additional platforms (YouTube, GitHub, Instagram, TikTok) are v2.</p>
+
+  <h4>Agent Creation</h4>
+  <p>Every user creates one agent during onboarding. The agent receives its own Basename (e.g., <code>alice-agent.base.eth</code>), its own Agentic Wallet, and an ERC-8004 identity NFT that binds the agent's on-chain identity to the user's Basename. One agent per user in v1.</p>
+
+  <h2 id="f-wallets">5.5 Wallet Infrastructure</h2>
+
+  <h4>Human Wallet</h4>
+  <p>Each user receives a Coinbase CDP Wallet with MPC-based key management. Private keys are split across secure enclaves — neither the user nor Coinbase holds the complete key. The human wallet is the user's primary token storage and the funding source for their agent.</p>
+
+  <h4>Agent Wallet</h4>
+  <p>Each agent receives a Coinbase Agentic Wallet provisioned via the CDP API. Agentic Wallets are purpose-built for autonomous operation with built-in safety controls:</p>
+  <ul>
+    <li><strong>Session-level spending caps:</strong> Maximum USDC equivalent per trading session</li>
+    <li><strong>Per-transaction limits:</strong> Maximum single trade size</li>
+    <li><strong>Enclave-isolated keys:</strong> Agent keys never leave the secure enclave</li>
+    <li><strong>KYT compliance:</strong> Know Your Transaction monitoring for regulatory alignment</li>
+  </ul>
+  <p>Users fund their agent wallet by transferring tokens from their human CDP wallet. Withdrawals (agent → human wallet) are available at any time.</p>
+
+  <h2 id="f-reputation">5.6 Reputation System</h2>
+
+  <p>The reputation score is a weighted composite of four factors:</p>
+
+  <div class="callout">
+    <p><strong>R = αT + βV + γS + δC</strong></p>
+    <p><strong>T</strong> = Successfully settled trade count (normalized)</p>
+    <p><strong>V</strong> = Cumulative USDC-equivalent volume traded (log-scaled)</p>
+    <p><strong>S</strong> = Social verification score — for humans: X account age, follower count, ENS ownership. For agents: ERC-8004 reputation registry score.</p>
+    <p><strong>C</strong> = Counterparty rating average (1-5 stars, submitted post-trade)</p>
+    <p><strong>α, β, γ, δ</strong> = Tunable weights. Initial values determined during Phase 1 development via simulation.</p>
+  </div>
+
+  <h4>Verification Tiers</h4>
+  <table>
+    <thead><tr><th>Tier</th><th>Name</th><th>Requirements</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Verified</td><td>Basename registered, X account linked, 10+ settled trades</td></tr>
+      <tr><td>2</td><td>Trusted</td><td>Tier 1 + 100 trades, $1,000+ cumulative volume, 4.5+ average rating</td></tr>
+      <tr><td>3</td><td>Established</td><td>Tier 2 + 1,000 trades, $10,000+ volume, ENS linked, 6-month account age</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Anti-Gaming</h4>
+  <p>The social verification component (S) prevents pure wash-trading from inflating reputation. An account needs a real X account with real history to score well on S. Combined with counterparty ratings (C) — which cannot be self-assigned — the reputation system resists manipulation from single-actor Sybil attacks.</p>
+
+  <h2 id="f-agentconfig">5.7 Agent Configuration (V1 — Simple)</h2>
+  <p>Users configure their agent via a simple UI — no developer knowledge required. V1 configuration options:</p>
+  <ul>
+    <li><strong>Spending limit per trade:</strong> Maximum USDC equivalent the agent can commit to a single trade</li>
+    <li><strong>Daily spending cap:</strong> Maximum total USDC equivalent the agent can trade in 24 hours</li>
+    <li><strong>Approved token pairs:</strong> Which pairs the agent is allowed to trade (checkboxes)</li>
+    <li><strong>Auto-accept threshold:</strong> Automatically accept incoming offers below a specified price</li>
+  </ul>
+  <p>Agent capabilities in v1: post offers, accept offers, monitor Aerodrome prices, manage token inventory. Agent skills: <code>send</code>, <code>receive</code>, <code>trade</code>, <code>search-for-offer</code>, <code>post-offer</code>.</p>
+
+  <h2 id="f-privacy">5.8 Privacy (Application Layer)</h2>
+  <ul>
+    <li><strong>Trade metadata encryption:</strong> Memo fields, context notes, and messages between parties are encrypted end-to-end. On-chain, only the token transfer is visible.</li>
+    <li><strong>Profile visibility controls:</strong> Users can choose to trade exclusively as their agent profile, hiding their human identity from counterparties.</li>
+    <li><strong>Anonymous offer listing:</strong> Seller Basename is hidden on offer cards until a buyer initiates a trade. Reputation score and tier badge are still visible.</li>
+  </ul>
+
+  <h2 id="f-platform">5.9 Platform</h2>
+  <p>V1 launches as a <strong>mobile-responsive web application</strong> built with React and Next.js. Not native iOS or Android apps.</p>
+  <div class="callout">
+    <p><strong>Rationale:</strong> Web ships faster, doesn't require App Store or Google Play approval (crypto apps face significant review friction and potential rejection), allows rapid iteration without app update cycles, and is accessible from any device with a browser. Native apps are a v2 feature once product-market fit is validated and the team has bandwidth for platform-specific development.</p>
+  </div>
+  <p>The web app must be fully responsive and feel native on mobile browsers — optimized for iOS Safari and Android Chrome with smooth scrolling, touch-friendly tap targets, and app-like navigation patterns.</p>
+
+  <h2 id="f-revenue">5.10 Revenue Collection</h2>
+  <ul>
+    <li><strong>Exchange fee:</strong> 0.5% on all settled trades (0.25% buyer + 0.25% seller), deducted atomically at escrow settlement</li>
+    <li><strong>Basename registration service fee:</strong> Small service fee during onboarding for users who register a new Basename through Coin</li>
+    <li><strong>Treasury:</strong> All fee revenue collected into a project treasury wallet on Base, controlled by the team multi-sig</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<!-- 6. OUT OF SCOPE -->
+<!-- ============================================================ -->
+<div class="section page-break" id="out-of-scope">
+  <h1>6. V1 Explicitly Out of Scope</h1>
+  <p>The following features are intentionally excluded from v1. Each has a planned version for future inclusion.</p>
+
+  <div class="out-of-scope">
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Native iOS / Android apps — v2, after PMF validation on web</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Additional social integrations beyond X (YouTube, GitHub, Instagram, TikTok) — v2</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Automatic order book matching / limit orders — v2, manual offer selection in v1</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Non-Base tokens or multi-chain support — no Solana, no Ethereum mainnet trading</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Token launch — no COIN token in v1, period</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Apple Pay / Google Pay fiat onramping — v2, via Coinbase embedded wallet onramp</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Multi-agent support — one agent per user in v1</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Agent analytics dashboard — v2</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Zero-knowledge privacy / Midnight integration — v3+</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> On-chain dispute resolution — v2, atomic escrow minimizes disputes in v1</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Tweet-based transactions via X</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> macOS / desktop app</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Custom x402 facilitator — use Coinbase CDP only</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Third-party agent registration / ElizaOS plugins — v2, v1 uses Coin-operated + user agents only</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Ethos Network integration</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Verified checkmark paid tier — v2, v1 tiers are earned only</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Streaming micropayments</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> DEX aggregator integrations</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 7. SYSTEM ARCHITECTURE -->
+<!-- ============================================================ -->
+<div class="section page-break" id="architecture">
+  <h1>7. System Architecture</h1>
+
+  <h2 id="a-highlevel">7.1 High-Level Architecture</h2>
+
+  <div class="mermaid">
+graph TB
+    subgraph Client["Client Layer"]
+        WEB["Web App<br/>(React / Next.js)<br/>Mobile-responsive"]
+    end
+
+    subgraph Auth["Auth Layer"]
+        PRIVY["Privy<br/>Social login via X<br/>JWT sessions"]
+    end
+
+    subgraph API["API Layer"]
+        BACKEND["Backend API<br/>(Node.js)<br/>Offers · Reputation · Profiles<br/>Trade Orchestration · Price Feeds"]
+    end
+
+    subgraph Blockchain["Blockchain Layer (Base L2)"]
+        ESCROW["Escrow Smart Contract<br/>Atomic token swaps"]
+        USDC_C["USDC Contract<br/>EIP-3009 TransferWithAuth"]
+        ERC8004["ERC-8004 Registries<br/>(Ethereum L1, readable from Base)"]
+    end
+
+    subgraph External["External Services"]
+        CDP["Coinbase CDP API<br/>Human + Agent Wallets"]
+        BASENAME["Basenames Protocol<br/>Name registration"]
+        AERO["Aerodrome<br/>Price Feed"]
+        X402["x402 Protocol<br/>Agent-to-Agent payments"]
+    end
+
+    subgraph Data["Data Layer"]
+        PG["PostgreSQL<br/>Profiles · Offers · Trades<br/>Reputation cache · Metadata"]
+        ONCHAIN["On-Chain State<br/>Balances · Escrow · Identity NFTs"]
+    end
+
+    WEB --> PRIVY
+    WEB --> BACKEND
+    PRIVY --> BACKEND
+    BACKEND --> ESCROW
+    BACKEND --> USDC_C
+    BACKEND --> ERC8004
+    BACKEND --> CDP
+    BACKEND --> BASENAME
+    BACKEND --> AERO
+    BACKEND --> X402
+    BACKEND --> PG
+    ESCROW --> ONCHAIN
+    CDP --> ONCHAIN
+
+    style Client fill:#DBEAFE,stroke:#2563EB,stroke-width:2px
+    style Auth fill:#DBEAFE,stroke:#2563EB,stroke-width:2px
+    style API fill:#DBEAFE,stroke:#2563EB,stroke-width:2px
+    style Blockchain fill:#DBEAFE,stroke:#2563EB,stroke-width:2px
+    style External fill:#F9FAFB,stroke:#E5E7EB,stroke-width:2px
+    style Data fill:#F9FAFB,stroke:#E5E7EB,stroke-width:2px
+  </div>
+  <p class="diagram-caption">Figure 1 — High-level system architecture showing client, auth, API, blockchain, external services, and data layers.</p>
+
+  <h2 id="a-onboarding">7.2 User Onboarding Flow</h2>
+
+  <div class="mermaid">
+flowchart TD
+    A["App Load"] --> B["Privy Auth<br/>Sign in with X"]
+    B --> C{"Has Basename?"}
+    C -- No --> D["Select &amp; Register<br/>Basename"]
+    D --> E["Confirm on Base"]
+    C -- Yes --> F["Link Existing<br/>Basename"]
+    E --> G["Create CDP Wallet<br/>(Human, MPC-based)"]
+    F --> G
+    G --> H["Create Agentic Wallet<br/>(Agent, via CDP API)"]
+    H --> I["Create Agent Basename<br/>(e.g., alice-agent.base.eth)"]
+    I --> J["Register Agent<br/>ERC-8004 Identity NFT"]
+    J --> K["Configure Agent<br/>Spending limits · Approved pairs"]
+    K --> L{"Fund Agent?"}
+    L -- Yes --> M["Transfer from<br/>Human Wallet"]
+    L -- Later --> N["Skip for Now"]
+    M --> O["Profile Complete<br/>Enter Exchange"]
+    N --> O
+
+    style A fill:#DBEAFE,stroke:#2563EB,stroke-width:2px
+    style O fill:#D1FAE5,stroke:#059669,stroke-width:2px
+  </div>
+  <p class="diagram-caption">Figure 2 — User onboarding flow from initial app load through profile completion.</p>
+
+  <h2 id="a-settlement">7.3 Trade Settlement Flow</h2>
+
+  <div class="mermaid">
+sequenceDiagram
+    participant S as Seller
+    participant B as Buyer
+    participant API as Coin Backend
+    participant ESC as Escrow Contract
+    participant BASE as Base L2
+
+    S->>API: Post offer (token, qty, price)
+    API->>ESC: Lock seller's tokens in escrow
+    ESC->>BASE: Tokens locked on-chain
+    API-->>S: Offer live, tokens escrowed
+
+    B->>API: Browse offers
+    API-->>B: Return active offers with DEX price comparison
+
+    B->>API: Initiate trade on selected offer
+    API->>ESC: Create trade instance
+    API-->>B: Send payment tokens to escrow
+
+    B->>ESC: Fund buyer side (payment tokens)
+    ESC->>ESC: Verify both sides funded
+
+    ESC->>BASE: Execute atomic swap
+    BASE-->>S: Receive payment tokens
+    BASE-->>B: Receive seller's tokens
+    ESC->>BASE: Deduct 0.5% fee to treasury
+
+    API->>API: Update reputation scores
+    API-->>S: Trade confirmed + rate counterparty
+    API-->>B: Trade confirmed + rate counterparty
+  </div>
+  <p class="diagram-caption">Figure 3 — Complete trade settlement flow from offer posting through atomic swap and reputation update.</p>
+
+  <h2 id="a-market-making">7.4 Agent Market Making Flow</h2>
+
+  <div class="mermaid">
+sequenceDiagram
+    participant AGENT as Coin Agent
+    participant AERO as Aerodrome
+    participant API as Coin Backend
+    participant BUYER as Human Buyer
+    participant ESC as Escrow Contract
+
+    loop Every 30 seconds
+        AGENT->>AERO: Fetch ETH/USDC price
+        AERO-->>AGENT: Current price: 2,650.00 USDC
+    end
+
+    AGENT->>AGENT: Calculate spread<br/>Sell at 2,648.50 (0.06% below DEX)<br/>Buy at 2,646.00 (0.15% below DEX)
+
+    AGENT->>API: Post sell offer: 1 ETH @ 2,648.50 USDC
+    AGENT->>API: Post buy offer: 1 ETH @ 2,646.00 USDC
+
+    BUYER->>API: Browse offers, see agent's sell offer
+    Note over BUYER: "0.06% better than Aerodrome"
+    BUYER->>API: Initiate trade on sell offer
+
+    API->>ESC: Execute escrow settlement
+    ESC-->>BUYER: Receives 1 ETH
+    ESC-->>AGENT: Receives 2,648.50 USDC
+
+    AGENT->>AGENT: Check inventory<br/>Rebalance if needed
+    Note over AGENT: Earned 2.50 USDC spread<br/>on next buy-side fill
+  </div>
+  <p class="diagram-caption">Figure 4 — Coin-operated agent market making: price monitoring, offer posting, and spread capture.</p>
+
+  <h2 id="a-dual-profile">7.5 Dual Profile & Wallet Model</h2>
+
+  <div class="mermaid">
+graph TB
+    subgraph ACCOUNT["User Account"]
+        direction TB
+        subgraph HUMAN["Human Profile"]
+            HN["Basename: alice.base.eth"]
+            HW["CDP Wallet (MPC)"]
+            HX["X Verification ✓"]
+            HS["Social Score: 78"]
+        end
+        subgraph AGENTPROF["Agent Profile"]
+            AN["Basename: alice-agent.base.eth"]
+            AW["Agentic Wallet (CDP)"]
+            AI["ERC-8004 Identity NFT"]
+            AR["On-Chain Reputation: 92"]
+        end
+    end
+
+    HW -- "Fund Agent" --> AW
+    AW -- "Withdraw" --> HW
+
+    style ACCOUNT fill:#FFFFFF,stroke:#2563EB,stroke-width:2px
+    style HUMAN fill:#DBEAFE,stroke:#2563EB,stroke-width:1px
+    style AGENTPROF fill:#DBEAFE,stroke:#2563EB,stroke-width:1px
+  </div>
+  <p class="diagram-caption">Figure 5 — Dual profile model: each user has a human profile and an agent profile, each with its own wallet and identity.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- 8. WIREFRAMES -->
+<!-- ============================================================ -->
+<div class="section page-break" id="wireframes">
+  <h1>8. Wireframes</h1>
+  <p>The following wireframes represent the core screens of the Coin v1 web application. All screens are designed mobile-first at 375px width. The web app is fully responsive and scales to desktop viewports.</p>
+
+  <!-- 8.1 Onboarding -->
+  <h2>8.1 Onboarding</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px;">
+        <div style="font-size:48px;font-weight:700;color:#2563EB;letter-spacing:-1px;margin-bottom:12px;">COIN</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:48px;line-height:1.5;">Trade tokens peer-to-peer<br>with AI agents on Base</div>
+        <div style="width:100%;margin-bottom:16px;">
+          <div class="wf-btn wf-btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+            <span style="font-size:18px;">&#120143;</span> Sign in with X
+          </div>
+        </div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:24px;line-height:1.5;">
+          By signing in, you agree to our Terms of Service<br>and Privacy Policy
+        </div>
+        <div style="position:absolute;bottom:48px;font-size:12px;color:#D1D5DB;">coin.family</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8.2 Basename Registration -->
+  <h2>8.2 Basename Registration</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen" style="padding:0 16px;">
+        <div class="wf-header">
+          <div style="font-size:18px;font-weight:700;color:#111827;">Choose Your Name</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:4px;">Your on-chain identity on Base</div>
+        </div>
+        <div style="margin-top:16px;">
+          <div class="wf-label">Basename</div>
+          <div style="display:flex;align-items:center;gap:0;">
+            <input class="wf-input" type="text" value="alice" style="border-radius:10px 0 0 10px;margin-bottom:0;border-right:none;" readonly>
+            <div style="background:#F3F4F6;padding:12px 14px;border:1px solid #D1D5DB;border-radius:0 10px 10px 0;font-size:14px;color:#6B7280;white-space:nowrap;">.base.eth</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:#059669;">
+            <span>&#10003;</span> alice.base.eth is available
+          </div>
+        </div>
+        <div style="background:#F9FAFB;border-radius:10px;padding:14px;margin-top:20px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
+            <span style="color:#6B7280;">Registration cost</span>
+            <span style="font-weight:600;">0.002 ETH (~$5.30)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span style="color:#6B7280;">Duration</span>
+            <span style="font-weight:600;">1 year</span>
+          </div>
+        </div>
+        <div style="margin-top:24px;">
+          <div class="wf-btn wf-btn-primary">Register Basename</div>
+        </div>
+        <div style="text-align:center;margin-top:12px;">
+          <a style="font-size:13px;color:#2563EB;">I already have a Basename</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:32px;padding:12px;background:#DBEAFE;border-radius:10px;">
+          <span style="font-size:18px;">&#9432;</span>
+          <span style="font-size:12px;color:#1E40AF;line-height:1.4;">Your Basename is your identity on Coin. It's visible on your offers, profile, and trade history.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8.3 Agent Setup -->
+  <h2>8.3 Agent Setup</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen" style="padding:0 16px;">
+        <div class="wf-header">
+          <div style="font-size:18px;font-weight:700;color:#111827;">Set Up Your Agent</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:4px;">Your agent trades on your behalf 24/7</div>
+        </div>
+        <div style="margin-top:16px;">
+          <div class="wf-label">Agent Basename</div>
+          <div style="display:flex;align-items:center;gap:0;">
+            <input class="wf-input" type="text" value="alice-agent" style="border-radius:10px 0 0 10px;margin-bottom:0;border-right:none;" readonly>
+            <div style="background:#F3F4F6;padding:12px 14px;border:1px solid #D1D5DB;border-radius:0 10px 10px 0;font-size:14px;color:#6B7280;white-space:nowrap;">.base.eth</div>
+          </div>
+        </div>
+        <div style="margin-top:20px;">
+          <div class="wf-label">Daily Spending Cap (USDC)</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <input class="wf-input" type="text" value="500" style="margin-bottom:0;text-align:center;width:100px;" readonly>
+            <div style="flex:1;height:6px;background:#E5E7EB;border-radius:3px;position:relative;">
+              <div style="width:50%;height:100%;background:#2563EB;border-radius:3px;"></div>
+              <div style="position:absolute;top:-5px;left:50%;width:16px;height:16px;background:#2563EB;border-radius:50%;transform:translateX(-50%);"></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#9CA3AF;margin-top:4px;">
+            <span>$50</span><span>$1,000</span>
+          </div>
+        </div>
+        <div style="margin-top:20px;">
+          <div class="wf-label">Approved Token Pairs</div>
+          <div class="wf-check-row"><div class="wf-checkbox checked"></div> ETH / USDC</div>
+          <div class="wf-check-row"><div class="wf-checkbox checked"></div> AERO / USDC</div>
+          <div class="wf-check-row"><div class="wf-checkbox"></div> cbETH / USDC</div>
+          <div class="wf-check-row"><div class="wf-checkbox"></div> wstETH / USDC</div>
+          <div class="wf-check-row"><div class="wf-checkbox"></div> USDC / USDT</div>
+        </div>
+        <div style="margin-top:24px;">
+          <div class="wf-btn wf-btn-primary">Create Your Agent</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:16px;padding:12px;background:#DBEAFE;border-radius:10px;">
+          <span style="font-size:18px;">&#9889;</span>
+          <span style="font-size:12px;color:#1E40AF;line-height:1.4;">You can change these settings anytime. Your agent won't trade until you fund its wallet.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8.4 Exchange Main Screen -->
+  <h2>8.4 Exchange — Offer Feed</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen" style="padding:0 12px;position:relative;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;">
+          <div style="font-size:20px;font-weight:700;color:#2563EB;">COIN</div>
+          <div style="width:28px;height:28px;background:#DBEAFE;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#2563EB;font-weight:700;">A</div>
+        </div>
+        <div class="wf-tab-row">
+          <div class="wf-tab active">ETH/USDC</div>
+          <div class="wf-tab">AERO/USDC</div>
+          <div class="wf-tab">cbETH</div>
+          <div class="wf-tab">More</div>
+        </div>
+        <div class="wf-price-ref">
+          Aerodrome: <strong style="color:#111827;">1 ETH = 2,650.00 USDC</strong>
+        </div>
+
+        <!-- Offer Card 1 -->
+        <div class="wf-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-weight:600;font-size:13px;">maker-bot.base.eth</span>
+              <span class="wf-badge wf-badge-agent">Agent</span>
+            </div>
+            <span class="wf-badge wf-badge-tier">Tier 2</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+            <span style="font-size:11px;color:#6B7280;">Selling 5.0 ETH</span>
+            <span style="font-size:16px;font-weight:700;">2,648.50 <span style="font-size:12px;color:#6B7280;">USDC</span></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="wf-spread-good">0.06% better than DEX</span>
+            <div class="wf-small-btn" style="background:#2563EB;color:white;">Trade</div>
+          </div>
+        </div>
+
+        <!-- Offer Card 2 -->
+        <div class="wf-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-weight:600;font-size:13px;">whale.base.eth</span>
+              <span class="wf-badge wf-badge-human">Human</span>
+            </div>
+            <span class="wf-badge wf-badge-tier">Tier 3</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+            <span style="font-size:11px;color:#6B7280;">Selling 20.0 ETH</span>
+            <span style="font-size:16px;font-weight:700;">2,647.00 <span style="font-size:12px;color:#6B7280;">USDC</span></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="wf-spread-good">0.11% better than DEX</span>
+            <div class="wf-small-btn" style="background:#2563EB;color:white;">Trade</div>
+          </div>
+        </div>
+
+        <!-- Offer Card 3 -->
+        <div class="wf-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-weight:600;font-size:13px;">arb-agent.base.eth</span>
+              <span class="wf-badge wf-badge-agent">Agent</span>
+            </div>
+            <span class="wf-badge wf-badge-tier">Tier 1</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+            <span style="font-size:11px;color:#6B7280;">Selling 2.5 ETH</span>
+            <span style="font-size:16px;font-weight:700;">2,651.20 <span style="font-size:12px;color:#6B7280;">USDC</span></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="wf-spread-bad">0.05% worse than DEX</span>
+            <div class="wf-small-btn" style="background:#2563EB;color:white;">Trade</div>
+          </div>
+        </div>
+
+        <!-- Post Offer FAB -->
+        <div style="position:absolute;bottom:72px;right:20px;width:48px;height:48px;background:#2563EB;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(37,99,235,0.4);">
+          <span style="color:white;font-size:24px;font-weight:300;">+</span>
+        </div>
+
+        <div class="wf-nav">
+          <div class="wf-nav-item active"><span class="wf-nav-icon">&#9878;</span>Exchange</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9744;</span>My Offers</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9879;</span>Wallet</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9787;</span>Profile</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8.5 Offer Detail / Trade Initiation -->
+  <h2>8.5 Offer Detail / Trade Initiation</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen" style="padding:0 16px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid #E5E7EB;margin-bottom:16px;">
+          <span style="font-size:18px;color:#6B7280;">&#8592;</span>
+          <span style="font-size:16px;font-weight:600;">Trade Details</span>
+        </div>
+
+        <!-- Seller Info -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <div style="width:40px;height:40px;background:#DBEAFE;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#2563EB;font-weight:700;">M</div>
+          <div>
+            <div style="font-weight:600;font-size:14px;">maker-bot.base.eth</div>
+            <div style="display:flex;gap:6px;align-items:center;margin-top:2px;">
+              <span class="wf-badge wf-badge-agent">Agent</span>
+              <span class="wf-badge wf-badge-tier">Tier 2</span>
+              <span style="font-size:11px;color:#6B7280;">847 trades</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Offer Info -->
+        <div style="background:#F9FAFB;border-radius:12px;padding:16px;margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-size:12px;color:#6B7280;">Selling</span>
+            <span style="font-weight:600;">5.0 ETH</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-size:12px;color:#6B7280;">Price per ETH</span>
+            <span style="font-weight:600;">2,648.50 USDC</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-size:12px;color:#6B7280;">Aerodrome price</span>
+            <span style="color:#6B7280;">2,650.00 USDC</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-size:12px;color:#6B7280;">vs DEX</span>
+            <span class="wf-spread-good">0.06% better</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:12px;color:#6B7280;">Expires</span>
+            <span style="font-size:13px;">23 min remaining</span>
+          </div>
+        </div>
+
+        <!-- Amount Input -->
+        <div class="wf-label">Amount to buy (ETH)</div>
+        <input class="wf-input" type="text" value="2.0" readonly>
+
+        <!-- Cost Breakdown -->
+        <div style="background:#F9FAFB;border-radius:12px;padding:14px;margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
+            <span style="color:#6B7280;">Subtotal</span>
+            <span>5,297.00 USDC</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
+            <span style="color:#6B7280;">Fee (0.25%)</span>
+            <span>13.24 USDC</span>
+          </div>
+          <hr class="wf-divider">
+          <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;">
+            <span>Total</span>
+            <span>5,310.24 USDC</span>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:10px;background:#D1FAE5;border-radius:10px;">
+          <span style="color:#059669;font-size:14px;">&#10003;</span>
+          <span style="font-size:12px;color:#065F46;">You save ~$3.00 vs Aerodrome on this trade</span>
+        </div>
+
+        <div class="wf-btn wf-btn-primary">Confirm Trade</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8.6 Post Offer -->
+  <h2>8.6 Post Offer</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen" style="padding:0 16px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid #E5E7EB;margin-bottom:16px;">
+          <span style="font-size:18px;color:#6B7280;">&#8592;</span>
+          <span style="font-size:16px;font-weight:600;">Post Offer</span>
+        </div>
+
+        <div class="wf-toggle-row">
+          <div class="wf-toggle active">Selling</div>
+          <div class="wf-toggle inactive">Buying</div>
+        </div>
+
+        <div class="wf-label">Token</div>
+        <div class="wf-input" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
+          <span>ETH</span><span style="color:#9CA3AF;">&#9662;</span>
+        </div>
+
+        <div class="wf-label">Quantity</div>
+        <input class="wf-input" type="text" value="5.0" readonly>
+
+        <div class="wf-label">Price per ETH (USDC)</div>
+        <input class="wf-input" type="text" value="2,648.50" readonly>
+        <div style="font-size:11px;color:#6B7280;margin-top:-8px;margin-bottom:12px;">
+          Aerodrome: 2,650.00 USDC &nbsp;|&nbsp; <span style="color:#059669;font-weight:600;">Your spread: -0.06%</span>
+        </div>
+
+        <div style="display:flex;gap:12px;">
+          <div style="flex:1;">
+            <div class="wf-label">Expires in</div>
+            <div class="wf-input" style="display:flex;justify-content:space-between;align-items:center;">
+              <span>1 hour</span><span style="color:#9CA3AF;">&#9662;</span>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div class="wf-label">Min trade size</div>
+            <input class="wf-input" type="text" value="0.1 ETH" readonly>
+          </div>
+        </div>
+
+        <div style="background:#F9FAFB;border-radius:12px;padding:14px;margin:16px 0;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
+            <span style="color:#6B7280;">Total offer value</span>
+            <span style="font-weight:600;">13,242.50 USDC</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span style="color:#6B7280;">Your fee on fill (0.25%)</span>
+            <span>33.11 USDC</span>
+          </div>
+        </div>
+
+        <div class="wf-btn wf-btn-primary">Post Offer</div>
+        <div style="text-align:center;font-size:11px;color:#9CA3AF;margin-top:8px;">Your tokens will be locked in escrow until the offer expires or is filled.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8.7 Profile -->
+  <h2>8.7 Profile</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen" style="padding:0 12px;position:relative;">
+        <div style="text-align:center;padding:16px 0 12px;">
+          <div style="width:56px;height:56px;background:#DBEAFE;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;color:#2563EB;font-weight:700;margin:0 auto 8px;">A</div>
+          <div style="font-size:16px;font-weight:700;">alice.base.eth</div>
+          <div style="display:flex;justify-content:center;gap:6px;margin-top:6px;">
+            <span class="wf-badge wf-badge-human">Human</span>
+            <span class="wf-badge wf-badge-tier">Tier 2 — Trusted</span>
+          </div>
+          <div style="font-size:11px;color:#6B7280;margin-top:4px;">@alice_crypto &#10003;</div>
+        </div>
+
+        <!-- Stats -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <div style="flex:1;background:#F9FAFB;border-radius:10px;padding:10px;text-align:center;">
+            <div class="wf-stat-value">142</div>
+            <div class="wf-stat-label">Trades</div>
+          </div>
+          <div style="flex:1;background:#F9FAFB;border-radius:10px;padding:10px;text-align:center;">
+            <div class="wf-stat-value">$47K</div>
+            <div class="wf-stat-label">Volume</div>
+          </div>
+          <div style="flex:1;background:#F9FAFB;border-radius:10px;padding:10px;text-align:center;">
+            <div class="wf-stat-value">4.8</div>
+            <div class="wf-stat-label">Rating</div>
+          </div>
+        </div>
+
+        <hr class="wf-divider">
+
+        <!-- Agent Section -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="width:32px;height:32px;background:#DBEAFE;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;">&#9889;</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;">alice-agent.base.eth</div>
+            <div style="font-size:11px;color:#6B7280;">Your Agent &nbsp;|&nbsp; <span style="color:#059669;">Active</span></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <div style="flex:1;background:#F9FAFB;border-radius:10px;padding:8px;text-align:center;">
+            <div style="font-size:16px;font-weight:700;color:#2563EB;">89</div>
+            <div style="font-size:10px;color:#6B7280;">Rep Score</div>
+          </div>
+          <div style="flex:1;background:#F9FAFB;border-radius:10px;padding:8px;text-align:center;">
+            <div style="font-size:16px;font-weight:700;color:#2563EB;">$32K</div>
+            <div style="font-size:10px;color:#6B7280;">Agent Vol</div>
+          </div>
+          <div style="flex:1;background:#F9FAFB;border-radius:10px;padding:8px;text-align:center;">
+            <div style="font-size:16px;font-weight:700;color:#2563EB;">3</div>
+            <div style="font-size:10px;color:#6B7280;">Active Offers</div>
+          </div>
+        </div>
+
+        <!-- Wallet Overview -->
+        <hr class="wf-divider">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Wallets</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <div style="flex:1;background:#F9FAFB;border-radius:10px;padding:10px;">
+            <div style="font-size:10px;color:#6B7280;margin-bottom:4px;">Your Wallet</div>
+            <div style="font-size:15px;font-weight:700;">$8,420</div>
+          </div>
+          <div style="flex:1;background:#F9FAFB;border-radius:10px;padding:10px;">
+            <div style="font-size:10px;color:#6B7280;margin-bottom:4px;">Agent Wallet</div>
+            <div style="font-size:15px;font-weight:700;">$2,180</div>
+          </div>
+        </div>
+
+        <div class="wf-nav">
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9878;</span>Exchange</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9744;</span>My Offers</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9879;</span>Wallet</div>
+          <div class="wf-nav-item active"><span class="wf-nav-icon">&#9787;</span>Profile</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8.8 Wallet -->
+  <h2>8.8 Wallet</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen" style="padding:0 12px;position:relative;">
+        <div style="padding:12px 0;font-size:18px;font-weight:700;text-align:center;">Wallet</div>
+
+        <!-- Human Wallet -->
+        <div class="wf-wallet-section">
+          <div class="wf-wallet-title">Your Wallet</div>
+          <div class="wf-token-row"><span class="wf-token-name">USDC</span><span class="wf-token-bal">6,240.00</span></div>
+          <div class="wf-token-row"><span class="wf-token-name">ETH</span><span class="wf-token-bal">0.82</span></div>
+          <div class="wf-token-row"><span class="wf-token-name">AERO</span><span class="wf-token-bal">1,200.00</span></div>
+          <div class="wf-token-row"><span class="wf-token-name">cbETH</span><span class="wf-token-bal">0.00</span></div>
+          <hr class="wf-divider">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:12px;color:#6B7280;">Total value</span>
+            <span style="font-weight:700;">$8,420.50</span>
+          </div>
+        </div>
+
+        <!-- Agent Wallet -->
+        <div class="wf-wallet-section">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="wf-wallet-title" style="margin-bottom:0;">Agent Wallet</div>
+            <span style="font-size:11px;color:#059669;font-weight:500;">&#9679; Active</span>
+          </div>
+          <div style="margin-top:8px;">
+            <div class="wf-token-row"><span class="wf-token-name">USDC</span><span class="wf-token-bal">1,500.00</span></div>
+            <div class="wf-token-row"><span class="wf-token-name">ETH</span><span class="wf-token-bal">0.25</span></div>
+            <div class="wf-token-row"><span class="wf-token-name">AERO</span><span class="wf-token-bal">450.00</span></div>
+          </div>
+          <hr class="wf-divider">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <span style="font-size:12px;color:#6B7280;">Total value</span>
+            <span style="font-weight:700;">$2,180.25</span>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <div class="wf-small-btn" style="flex:1;text-align:center;background:#2563EB;color:white;padding:10px;">Fund Agent</div>
+            <div class="wf-small-btn" style="flex:1;text-align:center;background:#F3F4F6;color:#111827;padding:10px;">Withdraw</div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div style="margin-top:16px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Recent Activity</div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F3F4F6;font-size:12px;">
+            <div><span style="color:#059669;">&#8593;</span> Sold 1.0 ETH</div>
+            <div style="color:#6B7280;">+2,648.50 USDC</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F3F4F6;font-size:12px;">
+            <div><span style="color:#2563EB;">&#8594;</span> Funded agent</div>
+            <div style="color:#6B7280;">500.00 USDC</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:12px;">
+            <div><span style="color:#DC2626;">&#8595;</span> Bought 0.5 ETH</div>
+            <div style="color:#6B7280;">-1,325.00 USDC</div>
+          </div>
+        </div>
+
+        <div class="wf-nav">
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9878;</span>Exchange</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9744;</span>My Offers</div>
+          <div class="wf-nav-item active"><span class="wf-nav-icon">&#9879;</span>Wallet</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9787;</span>Profile</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 9. DEVELOPMENT TIMELINE -->
+<!-- ============================================================ -->
+<div class="section page-break" id="timeline">
+  <h1>9. Development Timeline</h1>
+  <p>Based on a team of 4-5 developers moving fast. Total estimated duration: 3 months. The team will expand as needed during and after launch.</p>
+
+  <h2>Phase 0: Foundation & Spikes (Weeks 1-2)</h2>
+  <ul>
+    <li>Finalize PRD and architecture alignment with full team</li>
+    <li>Set up monorepo (Turborepo or Nx), CI/CD (GitHub Actions), GitHub Projects board</li>
+    <li><strong>Spike 1:</strong> Privy auth &rarr; X login &rarr; JWT session management (2-3 days)</li>
+    <li><strong>Spike 2:</strong> Coinbase CDP API &rarr; create human CDP wallet + Agentic Wallet (3-4 days)</li>
+    <li><strong>Spike 3:</strong> Basename registration and resolution via Basenames API (2-3 days)</li>
+    <li><strong>Spike 4:</strong> Deploy test escrow smart contract on Base Sepolia testnet (3-4 days)</li>
+    <li><strong>Spike 5:</strong> Fetch Aerodrome pool prices for reference pricing (1-2 days)</li>
+  </ul>
+  <div class="callout">
+    <p><strong>Deliverable:</strong> Working proof-of-concept: user signs in via Privy, gets CDP + Agentic wallets provisioned, can register a Basename, and test escrow settles on Base Sepolia.</p>
+  </div>
+
+  <h2>Phase 1: Core Infrastructure (Weeks 3-5)</h2>
+  <ul>
+    <li>Backend API scaffolding (Node.js with Express or Fastify)</li>
+    <li>Database schema design and migration (PostgreSQL): users, agents, offers, trades, reputation</li>
+    <li>CDP Wallet integration — full CRUD: create, fund, withdraw, balance queries</li>
+    <li>Basename registration flow integrated into onboarding</li>
+    <li>ERC-8004 agent registration — identity NFT minting on testnet</li>
+    <li>Privy auth integration — full flow with session management and JWT validation</li>
+    <li>Escrow smart contract: full implementation, unit tests, testnet deployment</li>
+    <li>Basic agent runtime: first Coin-operated market-making agent that monitors Aerodrome and posts offers</li>
+  </ul>
+  <div class="callout">
+    <p><strong>Deliverable:</strong> Backend API with wallet provisioning, identity registration, and escrow settlement working end-to-end on Base Sepolia testnet.</p>
+  </div>
+
+  <h2>Phase 2: Exchange MVP (Weeks 6-9)</h2>
+  <ul>
+    <li>Offer posting UI and API (create, edit, cancel, auto-expire)</li>
+    <li>Offer browsing UI — feed layout, filters, search, token pair tabs</li>
+    <li>Trade initiation flow — select offer &rarr; fund escrow &rarr; settlement &rarr; confirmation screen</li>
+    <li>DEX reference price display on all offers (Aerodrome pool price integration)</li>
+    <li>Reputation scoring engine — formula implementation, score recalculation on each trade</li>
+    <li>Counterparty rating system — post-trade 1-5 star rating with optional comment</li>
+    <li>Profile pages — dual profile display with human and agent sections</li>
+    <li>Agent configuration UI — spending limits, approved pairs, auto-accept threshold</li>
+    <li>Wallet management UI — balances, fund agent, withdraw, transaction history</li>
+    <li>Deploy 10-20 Coin-operated market-making agents on testnet</li>
+  </ul>
+  <div class="callout">
+    <p><strong>Deliverable:</strong> Fully functional exchange on Base Sepolia with Coin-operated agents providing liquidity, offer browsing, trade settlement, and reputation scoring.</p>
+  </div>
+
+  <h2>Phase 3: Polish, Security & Launch (Weeks 10-12)</h2>
+  <ul>
+    <li>End-to-end encryption for trade metadata (memos, context, notes between parties)</li>
+    <li>Profile visibility controls — trade as agent only, hide human identity</li>
+    <li>Anonymous offer listing mode — Basename hidden until trade initiation</li>
+    <li>Verification tier badges — visual display based on reputation score and tier criteria</li>
+    <li>Push notifications — trade confirmations, offer matches, agent activity alerts</li>
+    <li>Mobile responsiveness refinement — iOS Safari, Android Chrome optimization</li>
+    <li>UI/UX polish pass — animations, loading states, error handling, empty states</li>
+    <li><strong>Security audit:</strong> External auditor reviews escrow smart contract</li>
+    <li><strong>Penetration testing:</strong> Third-party security firm tests backend API</li>
+  </ul>
+  <div class="callout">
+    <p><strong>Deliverable:</strong> Production-ready exchange with privacy features, polished UI, and completed security audit.</p>
+  </div>
+
+  <h2>Phase 4: Mainnet & Go-Live (Week 12-13)</h2>
+  <ul>
+    <li>Testnet &rarr; Base mainnet migration of all contracts and infrastructure</li>
+    <li>Deploy Coin-operated agents on mainnet with real funds (team-funded inventory)</li>
+    <li>Escrow contract mainnet deployment</li>
+    <li>Beta testing: closed group of 50-100 users + agents</li>
+    <li>Bug fixes and performance optimization from beta feedback</li>
+    <li>Documentation: user guides, agent operator guide, API reference</li>
+    <li>Open-source repository preparation (license, README, contributing guidelines)</li>
+    <li>Launch marketing coordination</li>
+  </ul>
+  <div class="callout">
+    <p><strong>Deliverable:</strong> Public launch on Base mainnet. Ship fast, iterate in production.</p>
+  </div>
+
+  <div class="callout-warning callout" style="margin-top:32px;">
+    <p><strong>Timeline Note:</strong> This is an aggressive 3-month timeline. The team ships fast and expands as needed — additional developers join during and after launch to support v2 development. Privacy features (E2E encryption, anonymous listings) and the security audit run in parallel with launch prep. The team can onboard 2-3 more developers post-launch to accelerate v2.</p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 10. SUCCESS METRICS -->
+<!-- ============================================================ -->
+<div class="section page-break" id="success-metrics">
+  <h1>10. Success Metrics</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Metric</th>
+        <th>Launch Target (Week 13)</th>
+        <th>3-Month Post-Launch</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Daily Gross Merchandise Volume (GMV)</td>
+        <td>$50K+</td>
+        <td>$500K+</td>
+      </tr>
+      <tr>
+        <td>Active Agents (including Coin-operated)</td>
+        <td>50+</td>
+        <td>500+</td>
+      </tr>
+      <tr>
+        <td>Active Human Traders</td>
+        <td>100+</td>
+        <td>2,000+</td>
+      </tr>
+      <tr>
+        <td>Average Spread vs Aerodrome</td>
+        <td>-0.05% to -0.10% better</td>
+        <td>Maintain or improve</td>
+      </tr>
+      <tr>
+        <td>Trade Settlement Success Rate</td>
+        <td>&gt;99%</td>
+        <td>&gt;99.5%</td>
+      </tr>
+      <tr>
+        <td>Average Settlement Time</td>
+        <td>&lt;10 seconds</td>
+        <td>&lt;5 seconds</td>
+      </tr>
+      <tr>
+        <td>Exchange Fee Revenue (monthly)</td>
+        <td>$7.5K+</td>
+        <td>$75K+</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- 11. RISKS & MITIGATIONS -->
+<!-- ============================================================ -->
+<div class="section page-break" id="risks">
+  <h1>11. Risks & Mitigations</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:25%;">Risk</th>
+        <th style="width:12%;">Severity</th>
+        <th>Mitigation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Coinbase builds this themselves</strong></td>
+        <td><span class="sev-high">High</span></td>
+        <td>Move fast and build network effects before a potential competitor launches. Coinbase is incentivized to support the Base ecosystem, not compete with every app on it. Their x402 Bazaar is a discovery layer, not a trading venue.</td>
+      </tr>
+      <tr>
+        <td><strong>Liquidity cold start</strong></td>
+        <td><span class="sev-high">High</span></td>
+        <td>Coin-operated agents bootstrap day-one liquidity across all supported pairs. Agents undercut Aerodrome prices by 0.05-0.10% to attract the first human traders. Agent-to-agent trades seed visible volume.</td>
+      </tr>
+      <tr>
+        <td><strong>Smart contract exploit</strong></td>
+        <td><span class="sev-high">High</span></td>
+        <td>External security audit of escrow contract before mainnet deployment. Per-trade escrow caps at launch (maximum $10K per trade initially). Progressive trust limits that increase with reputation tier. Bug bounty program.</td>
+      </tr>
+      <tr>
+        <td><strong>Regulatory uncertainty</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td>P2P token exchange classification varies by jurisdiction. Basename + ERC-8004 identity provides Know-Your-Agent (KYA) compliance. Coinbase CDP wallet infrastructure includes built-in KYT monitoring. Legal counsel required before mainnet launch.</td>
+      </tr>
+      <tr>
+        <td><strong>Agent misbehavior / manipulation</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td>Reputation system penalizes bad actors through low counterparty ratings. Dual-profile binding means the human behind every agent is accountable. Rate limiting on offer updates prevents quote manipulation (quote stuffing).</td>
+      </tr>
+      <tr>
+        <td><strong>ERC-8004 immaturity</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td>Standard launched January 29, 2026 — very new. Monitor for contract vulnerabilities and governance changes. Maintain a fallback identity system (custom NFT-based agent registry) if ERC-8004 encounters critical issues.</td>
+      </tr>
+      <tr>
+        <td><strong>Privy + CDP wallet integration friction</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td>Untested integration path: Privy for auth + CDP for wallets. Phase 0 spike specifically validates this integration. Fallback: CDP-only authentication if Privy creates conflicts with wallet provisioning flow.</td>
+      </tr>
+      <tr>
+        <td><strong>Team capacity</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td>Five people, unfunded, aggressive timeline. Mitigate with ruthless scope control (this PRD defines exactly what ships in v1 and nothing more) and parallel funding applications during Phase 0-1.</td>
+      </tr>
+      <tr>
+        <td><strong>DEX aggregator competition</strong></td>
+        <td><span class="sev-low">Low</span></td>
+        <td>Aggregators (1inch, Paraswap) solve trade routing across DEX pools — a fundamentally different problem than P2P exchange. Long-term, aggregators are a distribution channel: they can route through Coin when P2P offers beat DEX prices.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- 12. OPEN QUESTIONS -->
+<!-- ============================================================ -->
+<div class="section page-break" id="open-questions">
+  <h1>12. Open Questions</h1>
+
+  <ol>
+    <li style="margin-bottom:16px;">
+      <strong>Escrow contract design: atomic swap vs. time-locked two-phase commit?</strong><br>
+      <span style="color:#6B7280;font-size:14px;">Atomic swap is simpler and guarantees simultaneous settlement, but requires both parties to fund within a single transaction window. Two-phase commit allows sequential funding with timeout, which is more flexible for human counterparties but adds complexity and a partial-funding edge case. Decision needed during Phase 1 smart contract design.</span>
+    </li>
+    <li style="margin-bottom:16px;">
+      <strong>Agent pricing strategy: static offset vs. dynamic spread?</strong><br>
+      <span style="color:#6B7280;font-size:14px;">Should Coin-operated agents use a fixed percentage offset from Aerodrome prices (simple, predictable), or dynamically adjust spreads based on volatility, volume, and inventory levels (more profitable, more complex)? Static is recommended for launch with dynamic as a Phase 2 upgrade.</span>
+    </li>
+    <li style="margin-bottom:16px;">
+      <strong>Fee distribution: how should treasury revenue be allocated?</strong><br>
+      <span style="color:#6B7280;font-size:14px;">The 0.5% exchange fee goes to the project treasury. What is the allocation between operational costs (infrastructure, security audits), contributor compensation, and reserves? This requires a legal entity and contributor agreement to formalize.</span>
+    </li>
+    <li style="margin-bottom:16px;">
+      <strong>Reputation weight initialization: what are the initial values for &alpha;, &beta;, &gamma;, &delta;?</strong><br>
+      <span style="color:#6B7280;font-size:14px;">The reputation formula R = &alpha;T + &beta;V + &gamma;S + &delta;C needs calibrated weights. Simulation and modeling against synthetic trade data is needed before launch to ensure the formula produces meaningful differentiation between participants.</span>
+    </li>
+    <li style="margin-bottom:16px;">
+      <strong>Token listing criteria: what thresholds must a Base token meet?</strong><br>
+      <span style="color:#6B7280;font-size:14px;">V1 launches with 6 curated tokens. Post-launch, what minimum daily volume, liquidity depth, contract audit status, and Base deployment age must a token have to be listed? Who makes the listing decision — the team, or a governance process?</span>
+    </li>
+    <li style="margin-bottom:16px;">
+      <strong>Legal entity: what jurisdiction and structure?</strong><br>
+      <span style="color:#6B7280;font-size:14px;">Options include Delaware LLC, Wyoming DAO LLC, Cayman Foundation, or Swiss Association. Each has different implications for token launch eligibility, contributor liability, and regulatory treatment of exchange operations. Legal counsel engagement needed before Phase 1.</span>
+    </li>
+    <li style="margin-bottom:16px;">
+      <strong>Contributor agreement: equity, vesting, and compensation structure?</strong><br>
+      <span style="color:#6B7280;font-size:14px;">Equity splits, vesting schedules, and salary arrangements from post-launch revenue have been discussed but not formalized. This must be resolved before Phase 1 begins to ensure all contributors are aligned and protected.</span>
+    </li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<!-- 13. REFERENCES -->
+<!-- ============================================================ -->
+<div class="section page-break" id="references">
+  <h1>13. References</h1>
+
+  <ol>
+    <li style="margin-bottom:12px;">Coinbase, "x402: A Payments Protocol for the Internet," 2025–2026. <a href="https://github.com/coinbase/x402">https://github.com/coinbase/x402</a></li>
+    <li style="margin-bottom:12px;">D. Crapis, "ERC-8004 Genesis Month — Ethereum Mainnet Launch," January 29, 2026.</li>
+    <li style="margin-bottom:12px;">Coinbase, "Introducing Agentic Wallets," February 11, 2026. <a href="https://docs.cdp.coinbase.com/agentic-wallet">https://docs.cdp.coinbase.com/agentic-wallet</a></li>
+    <li style="margin-bottom:12px;">Base, "Basenames: On-chain Identity for Base," 2024–2026. <a href="https://www.base.org/names">https://www.base.org/names</a></li>
+    <li style="margin-bottom:12px;">Coinbase Developer Platform, "x402 Network Support and Facilitator Documentation," 2026. <a href="https://docs.cdp.coinbase.com/x402">https://docs.cdp.coinbase.com/x402</a></li>
+    <li style="margin-bottom:12px;">Coinbase, "AgentKit," 2025–2026. <a href="https://github.com/coinbase/agentkit">https://github.com/coinbase/agentkit</a></li>
+    <li style="margin-bottom:12px;">Base Network, "Transaction Fees and Settlement," 2026. <a href="https://docs.base.org">https://docs.base.org</a></li>
+    <li style="margin-bottom:12px;">Aerodrome Finance, "Base DEX," 2024–2026. <a href="https://aerodrome.finance">https://aerodrome.finance</a></li>
+  </ol>
+</div>
+
+<hr>
+
+<div style="text-align: center; padding: 48px 0; color: #6B7280; font-size: 13px;">
+  <p><strong>COIN</strong> — Product Requirements Document v1</p>
+  <p>coin.family</p>
+  <p style="margin-top: 16px;">Confidential — Internal Use Only</p>
+  <p>February 2026</p>
+</div>
+
+</div><!-- end container -->
+
+</body>
+</html>

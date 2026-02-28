@@ -91,10 +91,8 @@ const config: Config = {
         {
           title: 'Repositories',
           items: [
-            { label: 'coin-web', href: 'https://github.com/coin-agent-exchange/coin-web' },
-            { label: 'coin-convex', href: 'https://github.com/coin-agent-exchange/coin-convex' },
-            { label: 'coin-escrow', href: 'https://github.com/coin-agent-exchange/coin-escrow' },
-            { label: 'coin-agents', href: 'https://github.com/coin-agent-exchange/coin-agents' },
+            { label: 'coinV1-dex (Monorepo)', href: 'https://github.com/coin-agent-exchange/coinV1-dex' },
+            { label: 'coin-docs', href: 'https://github.com/coin-agent-exchange/coin-docs' },
           ],
         },
         {

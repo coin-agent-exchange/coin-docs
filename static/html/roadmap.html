@@ -1,0 +1,2202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coin — Product Roadmap (Solana)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#DBEAFE',
+        primaryTextColor: '#111827',
+        primaryBorderColor: '#2563EB',
+        lineColor: '#2563EB',
+        secondaryColor: '#F9FAFB',
+        tertiaryColor: '#DBEAFE'
+      },
+      gantt: {
+        titleTopMargin: 25,
+        barHeight: 24,
+        barGap: 6,
+        topPadding: 60,
+        sidePadding: 60,
+        numberSectionStyles: 4
+      }
+    });
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #111827;
+      background: #FFFFFF;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Cover Page */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 80px 24px;
+    }
+    .cover-logo {
+      font-size: 72px;
+      font-weight: 700;
+      color: #2563EB;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+    }
+    .cover-subtitle {
+      font-size: 24px;
+      font-weight: 500;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+    .cover-url {
+      font-size: 18px;
+      color: #6B7280;
+      margin-bottom: 8px;
+    }
+    .cover-date {
+      font-size: 16px;
+      color: #6B7280;
+      margin-bottom: 80px;
+    }
+    .cover-confidential {
+      font-size: 13px;
+      font-weight: 600;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-top: 1px solid #E5E7EB;
+      padding-top: 24px;
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #2563EB;
+    }
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1E40AF;
+      margin-top: 32px;
+      margin-bottom: 12px;
+    }
+    h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #111827;
+      margin-top: 24px;
+      margin-bottom: 8px;
+    }
+    p {
+      margin-bottom: 16px;
+      color: #111827;
+    }
+    ul, ol {
+      margin-bottom: 16px;
+      padding-left: 24px;
+    }
+    li {
+      margin-bottom: 6px;
+    }
+    a {
+      color: #2563EB;
+      text-decoration: none;
+    }
+    a:hover {
+      color: #1E40AF;
+      text-decoration: underline;
+    }
+    code {
+      background: #F3F4F6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #E5E7EB;
+      margin: 48px 0;
+    }
+    strong {
+      font-weight: 600;
+    }
+
+    /* Sections */
+    .section {
+      padding: 48px 0;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+
+    /* Table of Contents */
+    .toc {
+      padding: 48px 0;
+    }
+    .toc h1 {
+      margin-bottom: 24px;
+    }
+    .toc ol {
+      list-style: none;
+      counter-reset: toc-counter;
+      padding: 0;
+    }
+    .toc > ol > li {
+      counter-increment: toc-counter;
+      margin-bottom: 12px;
+    }
+    .toc > ol > li > a {
+      font-size: 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .toc > ol > li > a::before {
+      content: counter(toc-counter) ".";
+      color: #2563EB;
+      font-weight: 700;
+      min-width: 24px;
+    }
+    .toc > ol > li > ol {
+      list-style: none;
+      padding-left: 36px;
+      margin-top: 6px;
+    }
+    .toc > ol > li > ol > li {
+      margin-bottom: 6px;
+    }
+    .toc > ol > li > ol > li > a {
+      font-size: 14px;
+      color: #6B7280;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+    thead th {
+      background: #2563EB;
+      color: #FFFFFF;
+      font-weight: 600;
+      padding: 12px 16px;
+      text-align: left;
+    }
+    thead th:first-child {
+      border-top-left-radius: 8px;
+    }
+    thead th:last-child {
+      border-top-right-radius: 8px;
+    }
+    tbody td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #F3F4F6;
+      vertical-align: top;
+    }
+    tbody tr:nth-child(even) {
+      background: #F9FAFB;
+    }
+    tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 8px;
+    }
+    tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 8px;
+    }
+
+    /* Callout */
+    .callout {
+      background: #DBEAFE;
+      border-left: 4px solid #2563EB;
+      border-radius: 0 8px 8px 0;
+      padding: 20px 24px;
+      margin: 24px 0;
+    }
+    .callout p {
+      margin-bottom: 8px;
+    }
+    .callout p:last-child {
+      margin-bottom: 0;
+    }
+    .callout-warning {
+      background: #FEF3C7;
+      border-left-color: #D97706;
+    }
+    .callout-success {
+      background: #D1FAE5;
+      border-left-color: #059669;
+    }
+
+    /* Feature Cards */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin: 24px 0;
+    }
+    .feature-card {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      transition: box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .feature-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .feature-card-number {
+      background: #2563EB;
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 700;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .feature-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #111827;
+    }
+    .feature-card-body {
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .feature-card-body ul {
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+    .feature-card-body li {
+      margin-bottom: 4px;
+    }
+
+    /* Version badges */
+    .version-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .badge-mvp { background: #FEE2E2; color: #991B1B; }
+    .badge-v1 { background: #DBEAFE; color: #1E40AF; }
+    .badge-v2 { background: #D1FAE5; color: #065F46; }
+    .badge-v3 { background: #FEF3C7; color: #92400E; }
+    .badge-v4 { background: #EDE9FE; color: #5B21B6; }
+
+    /* Stat cards */
+    .stat-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 24px 0;
+    }
+    .stat-card {
+      flex: 1;
+      min-width: 160px;
+      background: #DBEAFE;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2563EB;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #1E40AF;
+      font-weight: 500;
+    }
+
+    /* Week cards for MVP */
+    .week-card {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .week-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .week-number {
+      background: #991B1B;
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .week-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #111827;
+    }
+    .week-milestone {
+      background: #F9FAFB;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 12px;
+      font-size: 13px;
+      border-left: 3px solid #059669;
+    }
+    .week-milestone strong {
+      color: #059669;
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding: 24px 0;
+      margin: 32px 0;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 20px;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #2563EB;
+      border-radius: 2px;
+    }
+    .timeline-item {
+      position: relative;
+      padding-left: 56px;
+      margin-bottom: 32px;
+    }
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: 12px;
+      top: 4px;
+      width: 20px;
+      height: 20px;
+      background: #2563EB;
+      border: 3px solid #DBEAFE;
+      border-radius: 50%;
+    }
+    .timeline-month {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2563EB;
+      margin-bottom: 2px;
+    }
+    .timeline-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+    }
+    .timeline-desc {
+      font-size: 13px;
+      color: #6B7280;
+      margin-top: 2px;
+    }
+
+    /* Mermaid */
+    .mermaid {
+      margin: 32px 0;
+      text-align: center;
+    }
+    .mermaid svg {
+      max-width: 100%;
+    }
+    .diagram-caption {
+      text-align: center;
+      font-size: 13px;
+      color: #6B7280;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* Team table */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .team-card {
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .team-handle {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2563EB;
+      margin-bottom: 4px;
+    }
+    .team-role {
+      font-size: 13px;
+      color: #6B7280;
+    }
+
+    /* Revenue chart bars */
+    .revenue-bar-chart {
+      margin: 24px 0;
+    }
+    .rev-bar-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+    .rev-bar-label {
+      min-width: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      text-align: right;
+    }
+    .rev-bar-track {
+      flex: 1;
+      background: #F3F4F6;
+      border-radius: 6px;
+      height: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .rev-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding-left: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #FFFFFF;
+      transition: width 0.5s;
+    }
+    .rev-bar-value {
+      min-width: 80px;
+      font-size: 13px;
+      color: #6B7280;
+      text-align: left;
+    }
+
+    /* Print styles */
+    @media print {
+      body { font-size: 12px; }
+      .cover { min-height: auto; padding: 120px 24px; page-break-after: always; }
+      .toc { page-break-after: always; }
+      .section { padding: 32px 0; }
+      .page-break { page-break-before: always; }
+      h1, h2, h3 { page-break-after: avoid; }
+      table, .feature-card, .callout, .week-card { page-break-inside: avoid; }
+      .mermaid { page-break-inside: avoid; }
+      .feature-card { box-shadow: none; border: 1px solid #E5E7EB; }
+      .timeline-item { page-break-inside: avoid; }
+      .stat-row { page-break-inside: avoid; }
+      a { color: #2563EB; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================ -->
+  <!-- COVER PAGE -->
+  <!-- ============================================================ -->
+  <div class="cover">
+    <div class="cover-logo">COIN</div>
+    <div class="cover-subtitle">Product Roadmap (Solana)</div>
+    <div class="cover-url">coin.family</div>
+    <div class="cover-date">February 2026</div>
+    <div class="cover-confidential">Confidential — Internal Use Only</div>
+  </div>
+
+  <div class="container">
+
+    <!-- ============================================================ -->
+    <!-- TABLE OF CONTENTS -->
+    <!-- ============================================================ -->
+    <div class="toc page-break">
+      <h1>Table of Contents</h1>
+      <ol>
+        <li><a href="#overview">Roadmap Overview</a></li>
+        <li><a href="#team">Team &amp; Budget Context</a></li>
+        <li><a href="#mvp">MVP Phase: Investor Demo (Weeks 1-4)</a>
+          <ol>
+            <li><a href="#mvp-week1">Week 1: Escrow Program + Agent Wallets</a></li>
+            <li><a href="#mvp-week2">Week 2: Agent Runtime + Offer Engine</a></li>
+            <li><a href="#mvp-week3">Week 3: Web UI + Live Demo</a></li>
+            <li><a href="#mvp-week4">Week 4: Polish + Mainnet Deploy</a></li>
+            <li><a href="#mvp-success">Success Criteria &amp; Infrastructure</a></li>
+          </ol>
+        </li>
+        <li><a href="#v1">V1: Full Product (Weeks 5-16)</a>
+          <ol>
+            <li><a href="#v1-phase1">Phase 1: Core Infrastructure (Weeks 5-8)</a></li>
+            <li><a href="#v1-phase2">Phase 2: Full Marketplace (Weeks 9-12)</a></li>
+            <li><a href="#v1-phase3">Phase 3: Security, Beta &amp; Launch (Weeks 13-16)</a></li>
+            <li><a href="#v1-metrics">V1 Success Metrics</a></li>
+          </ol>
+        </li>
+        <li><a href="#v2">V2: Growth (3-6 Months Post-Launch)</a>
+          <ol>
+            <li><a href="#v2-features">Features</a></li>
+            <li><a href="#v2-metrics">Success Metrics</a></li>
+          </ol>
+        </li>
+        <li><a href="#v3">V3: Scale (6-12 Months Post-Launch)</a>
+          <ol>
+            <li><a href="#v3-features">Features</a></li>
+            <li><a href="#v3-metrics">Success Metrics</a></li>
+          </ol>
+        </li>
+        <li><a href="#v4">V4+: Ecosystem (12+ Months)</a>
+          <ol>
+            <li><a href="#v4-features">Features</a></li>
+            <li><a href="#v4-metrics">Success Metrics</a></li>
+          </ol>
+        </li>
+        <li><a href="#gantt">Full Timeline (Gantt Chart)</a></li>
+        <li><a href="#revenue">Revenue Projections</a></li>
+        <li><a href="#milestones">Key Milestones</a></li>
+      </ol>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 1. ROADMAP OVERVIEW -->
+    <!-- ============================================================ -->
+    <div class="section page-break" id="overview">
+      <h1>1. Roadmap Overview</h1>
+      <p>This roadmap defines the product evolution of Coin, a peer-to-peer token exchange on Solana where AI agents and humans trade tokens directly with each other. The roadmap spans from a bootstrapped 4-week MVP through a fully-funded product build, growth phase, scale infrastructure, and long-term ecosystem development across approximately 24 months.</p>
+      <p>Coin's development follows a two-stage approach: a <strong>4-week bootstrapped MVP</strong> (near-zero cost using free-tier infrastructure) to demonstrate agent-to-agent P2P trading on Solana and secure funding, followed by a <strong>funded full build</strong> (estimated $200-350K) that takes the product from demo to public launch in approximately 12 additional weeks. After launch, the roadmap progresses through growth (V2), scale (V3), and ecosystem (V4+) phases, each gated by the success metrics of the prior phase.</p>
+
+      <div class="callout">
+        <p><strong>Roadmap Philosophy:</strong> Every feature earns its place by solving a specific user problem or unblocking a specific growth bottleneck. Features in later versions are deliberately sequenced because their value depends on earlier infrastructure being in place. The team does not advance to the next phase until the current phase's success metrics are confirmed.</p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-value">4 wks</div>
+          <div class="stat-label">MVP Timeline</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">~$200</div>
+          <div class="stat-label">MVP Cost</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">16 wks</div>
+          <div class="stat-label">Total to Launch</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">$200-350K</div>
+          <div class="stat-label">Post-Funding Build</div>
+        </div>
+      </div>
+
+      <p>The core thesis driving every phase: <strong>AI agents are structurally better market makers than AMM pools.</strong> They run 24/7, quote tighter spreads, never sleep, and serve as always-on liquidity for human traders who want better prices than DEXs offer. Coin is where those agents and humans meet. The MVP proves this thesis with real trades on Solana mainnet. Every subsequent phase expands on it.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 2. TEAM & BUDGET CONTEXT -->
+    <!-- ============================================================ -->
+    <div class="section page-break" id="team">
+      <h1>2. Team &amp; Budget Context</h1>
+      <p>Coin is built by a team of 5 equal partners (20% equity each), all working unpaid pre-funding. The partnership was formalized on February 20, 2026. The team is connected and aligned via Discord, collaborating continuously throughout February 2026. All contributors operate on a near-zero budget for the MVP phase (free-tier infrastructure + ~$200 mainnet seed capital), with a target post-funding development budget of $200-350K based on detailed cost analysis.</p>
+
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-handle">satsbased</div>
+          <div class="team-role">Product Vision &amp; Partnerships</div>
+        </div>
+        <div class="team-card">
+          <div class="team-handle">wes</div>
+          <div class="team-role">Product / Engineering</div>
+        </div>
+        <div class="team-card">
+          <div class="team-handle">2AM</div>
+          <div class="team-role">Product / Engineering</div>
+        </div>
+        <div class="team-card">
+          <div class="team-handle">dEXploarer</div>
+          <div class="team-role">Engineering Lead &amp; Product Branding</div>
+        </div>
+        <div class="team-card">
+          <div class="team-handle">0xJ0hnny.eth</div>
+          <div class="team-role">Web3 DApp Engineer</div>
+        </div>
+      </div>
+
+      <h3>Post-Funding Cost Breakdown (2AM's Analysis)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Estimated Cost</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Infrastructure (monthly)</td>
+            <td>~$4,000/mo</td>
+            <td>Vercel Pro, Convex Pro, Helius Growth, Railway, RPC nodes</td>
+          </tr>
+          <tr>
+            <td>Smart Contract Audit</td>
+            <td>$30,000 - $80,000</td>
+            <td>Deferred to V2; V1 uses audited library patterns + peer review</td>
+          </tr>
+          <tr>
+            <td>Legal (Wyoming DAO LLC + compliance)</td>
+            <td>$20,000 - $50,000</td>
+            <td>Entity formation, contributor agreement, terms of service</td>
+          </tr>
+          <tr>
+            <td>Agent Liquidity Seed</td>
+            <td>$5,000 - $10,000</td>
+            <td>Coin-operated agent wallets, treated as marketing cost</td>
+          </tr>
+          <tr>
+            <td>Contingency / Misc</td>
+            <td>$30,000 - $50,000</td>
+            <td>Domain costs, tooling, third-party services, unexpected expenses</td>
+          </tr>
+          <tr>
+            <td><strong>Total Estimated</strong></td>
+            <td><strong>$200,000 - $350,000</strong></td>
+            <td>Full product build from MVP to public launch + 3 months runway</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 3. MVP PHASE -->
+    <!-- ============================================================ -->
+    <div class="section page-break" id="mvp">
+      <h1>3. MVP Phase: Investor Demo (Weeks 1-4)</h1>
+      <p><span class="version-badge badge-mvp">MVP -- Weeks 1-4 -- Near-Zero Cost</span></p>
+      <p><strong>The single goal of the MVP is to demonstrate agent-to-agent P2P trading working on Solana -- real escrow-settled trades between AI agents, not a mockup.</strong> This is the fundraising asset. Investors need to see the core mechanism functioning: agents posting offers, agents accepting offers, atomic escrow settlement, Jupiter price reference, and the flywheel in action.</p>
+
+      <div class="callout">
+        <p><strong>MVP Definition of Done:</strong> Two or more AI agents autonomously posting offers, accepting counterparty offers, and settling trades via Solana program escrow on mainnet with real funds. A web UI shows the activity live. A human can also accept an agent's offer. This is not a prototype or a mockup -- it is a working product demo.</p>
+      </div>
+
+      <!-- Week 1 -->
+      <div class="week-card" id="mvp-week1">
+        <div class="week-card-header">
+          <span class="week-number">Week 1</span>
+          <span class="week-title">Escrow Program + Agent Wallets</span>
+        </div>
+        <div class="feature-card-body">
+          <ul>
+            <li>Deploy escrow Anchor program on Solana devnet implementing the two-phase commit pattern: <code>create_offer</code>, <code>accept_offer</code>, <code>cancel_offer</code></li>
+            <li>Create programmatic agent wallets (Solana keypairs) for 2-3 market-making agents</li>
+            <li>Integrate Jupiter aggregator API for SOL/USDC reference pricing</li>
+            <li>Fund agent wallets with devnet SOL and USDC via airdrop/faucet</li>
+            <li>Write integration tests confirming escrow lock, release, cancellation, and timeout flows</li>
+          </ul>
+          <div class="week-milestone">
+            <strong>Milestone:</strong> Two wallets can escrow-settle a token swap on Solana devnet. Escrow PDA holds tokens and releases atomically on completion.
+          </div>
+        </div>
+      </div>
+
+      <!-- Week 2 -->
+      <div class="week-card" id="mvp-week2">
+        <div class="week-card-header">
+          <span class="week-number">Week 2</span>
+          <span class="week-title">Agent Runtime + Offer Engine</span>
+        </div>
+        <div class="feature-card-body">
+          <ul>
+            <li>Build agent runtime in TypeScript: monitor Jupiter WebSocket price feeds, calculate spread, determine offer parameters</li>
+            <li>Implement offer creation flow: agent calls escrow program's <code>create_offer</code> with tokens locked in PDA</li>
+            <li>Implement offer acceptance flow: agent evaluates incoming offers against its auto-accept threshold and calls <code>accept_offer</code></li>
+            <li>Deploy 2-3 Coin-operated agents quoting SOL/USDC on devnet at 0.05-0.1% below Jupiter prices</li>
+            <li>Agents trading with each other automatically -- posting offers, accepting counterparty offers, settling via escrow</li>
+            <li>Simple backend API (Next.js API routes + Convex) to store and query offers and completed trades</li>
+          </ul>
+          <div class="week-milestone">
+            <strong>Milestone:</strong> Agents autonomously trading with each other on devnet. Offers posted, accepted, and settled without human intervention. All trades visible in Convex database.
+          </div>
+        </div>
+      </div>
+
+      <!-- Week 3 -->
+      <div class="week-card" id="mvp-week3">
+        <div class="week-card-header">
+          <span class="week-number">Week 3</span>
+          <span class="week-title">Web UI + Live Demo</span>
+        </div>
+        <div class="feature-card-body">
+          <ul>
+            <li>Build minimal web app (Next.js on Vercel): marketplace feed showing live agent offers with price, quantity, and spread vs Jupiter</li>
+            <li>Display Jupiter reference price alongside each offer, calculated as "X% better than Jupiter" or "X% worse than Jupiter"</li>
+            <li>Real-time trade feed showing completed agent-to-agent trades as they settle</li>
+            <li>Basic wallet connection (Phantom browser extension) so a human visitor can accept an agent's offer and execute a trade</li>
+            <li>Trade detail view linking to Solana Explorer for on-chain verification of escrow settlement</li>
+          </ul>
+          <div class="week-milestone">
+            <strong>Milestone:</strong> Web app showing live agent trading activity. A human can visit the site, connect Phantom, and execute a trade against an agent's offer with real escrow settlement.
+          </div>
+        </div>
+      </div>
+
+      <!-- Week 4 -->
+      <div class="week-card" id="mvp-week4">
+        <div class="week-card-header">
+          <span class="week-number">Week 4</span>
+          <span class="week-title">Polish + Mainnet Deploy + Investor Demo</span>
+        </div>
+        <div class="feature-card-body">
+          <ul>
+            <li>UI polish: loading states, trade confirmation animations, error handling, mobile responsive layout</li>
+            <li>Deploy escrow program to Solana mainnet</li>
+            <li>Fund 2-3 agents on mainnet with small real capital ($50-200 USDC per agent)</li>
+            <li>Agents trading on mainnet with real funds -- demonstrating the mechanism works with real value at stake</li>
+            <li>Record a 3-minute demo video of agents trading in real-time with on-chain settlement confirmation</li>
+            <li>Prepare investor demo flow: open the app, show live agent offers, show a trade settling in under 2 seconds, pull up Solana Explorer showing the escrow transaction</li>
+            <li>Landing page at coin.family with pitch summary and link to live demo</li>
+          </ul>
+          <div class="week-milestone">
+            <strong>Milestone:</strong> Working product demo on Solana mainnet with real funds. Investor-ready: show the app, show agents trading autonomously, execute a live trade, verify on-chain. Demo video recorded and landing page live.
+          </div>
+        </div>
+      </div>
+
+      <!-- MVP Success Criteria -->
+      <div id="mvp-success">
+        <h2>3.5 MVP Success Criteria</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Criteria</th>
+              <th>Target</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Escrow program deployed</td>
+              <td>Devnet + Mainnet</td>
+            </tr>
+            <tr>
+              <td>Agents autonomously posting offers</td>
+              <td>2-3 agents, SOL/USDC pair</td>
+            </tr>
+            <tr>
+              <td>Agent-to-agent trades settling</td>
+              <td>10+ trades per day</td>
+            </tr>
+            <tr>
+              <td>Spread vs Jupiter</td>
+              <td>-0.05% to -0.1% better</td>
+            </tr>
+            <tr>
+              <td>Settlement time</td>
+              <td>&lt;2 seconds</td>
+            </tr>
+            <tr>
+              <td>Human can accept an agent offer</td>
+              <td>Working in web UI via Phantom</td>
+            </tr>
+            <tr>
+              <td>Live trade feed</td>
+              <td>Real-time updates via Convex subscriptions</td>
+            </tr>
+            <tr>
+              <td>Total infrastructure cost</td>
+              <td>&lt;$50/month (all free tiers)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>MVP Infrastructure Costs (Free / Near-Free)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Plan</th>
+              <th>Monthly Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Vercel</td>
+              <td>Free tier (Hobby)</td>
+              <td>$0</td>
+            </tr>
+            <tr>
+              <td>Convex</td>
+              <td>Free tier (Starter plan)</td>
+              <td>$0</td>
+            </tr>
+            <tr>
+              <td>Helius RPC</td>
+              <td>Free tier (100K credits/day)</td>
+              <td>$0</td>
+            </tr>
+            <tr>
+              <td>Solana devnet</td>
+              <td>Free</td>
+              <td>$0</td>
+            </tr>
+            <tr>
+              <td>Solana mainnet agent funds</td>
+              <td>$50-200 USDC seed capital</td>
+              <td>One-time</td>
+            </tr>
+            <tr>
+              <td>Domain (coin.family)</td>
+              <td>Already owned</td>
+              <td>$0</td>
+            </tr>
+            <tr>
+              <td><strong>Total Monthly</strong></td>
+              <td></td>
+              <td><strong>&lt;$50</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>MVP Explicitly Not Included</h3>
+        <div class="callout callout-warning">
+          <p>The following features are intentionally excluded from the MVP to maintain focus on the core demo. They are all addressed in V1 (Weeks 5-16) after funding is secured:</p>
+          <ul style="margin-top: 8px; font-size: 14px;">
+            <li>User authentication / onboarding (agents only; human trades via direct Phantom wallet connect)</li>
+            <li>.sol domain registration</li>
+            <li>Reputation system</li>
+            <li>Agent identity cNFTs</li>
+            <li>Privacy features</li>
+            <li>Geo-blocking</li>
+            <li>Multiple token pairs (SOL/USDC only for MVP)</li>
+            <li>Agent configuration UI (agents configured by the team directly)</li>
+            <li>Tutorial / demo mode</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 4. V1: FULL PRODUCT -->
+    <!-- ============================================================ -->
+    <div class="section page-break" id="v1">
+      <h1>4. V1: Full Product (Weeks 5-16, Post-Funding)</h1>
+      <p><span class="version-badge badge-v1">V1 -- Weeks 5-16 -- Post-Funding ~$200-350K</span></p>
+      <p>After the MVP secures funding, the full product build begins. V1 transforms the agent-to-agent demo into a complete consumer product with authentication, identity, wallets, reputation, a full marketplace UI, and public launch on Solana mainnet. The build is divided into three phases across 12 weeks, with each phase producing a working deliverable.</p>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-value">$50K+</div>
+          <div class="stat-label">Daily GMV Target</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">50+</div>
+          <div class="stat-label">Active Agents</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">100+</div>
+          <div class="stat-label">Active Traders</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">&lt;2s</div>
+          <div class="stat-label">Settlement Time</div>
+        </div>
+      </div>
+
+      <!-- Phase 1 -->
+      <div id="v1-phase1">
+        <h2>4.1 Phase 1: Core Infrastructure (Weeks 5-8)</h2>
+        <p>Phase 1 builds the foundational infrastructure that the MVP did not include: authentication, wallets, identity, and expanded token support. By the end of Phase 1, the full backend is operational on devnet with real user accounts.</p>
+
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">1</div>
+              <div class="feature-card-title">Authentication via Privy</div>
+            </div>
+            <div class="feature-card-body">
+              Integrate Privy for social login supporting X (Twitter), Farcaster, and email. Privy handles session management and JWT tokens. Users sign in with one tap -- no seed phrases, no MetaMask.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">2</div>
+              <div class="feature-card-title">Embedded Wallets</div>
+            </div>
+            <div class="feature-card-body">
+              Create embedded Solana wallets for humans via Privy (MPC or enclave-based key management). Create programmatic Solana keypairs for agents. Users never see private keys -- wallet is abstracted behind the auth layer. Recovery via Privy social login.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">3</div>
+              <div class="feature-card-title">On-Chain Identity</div>
+            </div>
+            <div class="feature-card-body">
+              SNS / Bonfida .sol domain registration during onboarding. Agent identity cNFTs minted via Metaplex Bubblegum (compressed NFTs). Each user gets a .sol domain and their agent gets a separate .sol domain (e.g., <code>alice.sol</code> and <code>alice-agent.sol</code>).
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">4</div>
+              <div class="feature-card-title">Expanded Token Support</div>
+            </div>
+            <div class="feature-card-body">
+              Expand from SOL/USDC only (MVP) to all V1 listed tokens (14): <code>SOL</code>, <code>JUP</code>, <code>PUMP</code>, <code>ZEC</code>, <code>HYPE</code>, <code>SKR</code>, <code>cbBTC</code>, <code>ETH</code>, <code>BONK</code>, <code>PENGU</code>, <code>RAY</code>, <code>EURC</code>, <code>JTO</code>, <code>PYTH</code>. All tokens traded exclusively against USDC as the sole quote currency. New pairs added flexibly based on user requests and top Jupiter volume.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">5</div>
+              <div class="feature-card-title">Backend Expansion</div>
+            </div>
+            <div class="feature-card-body">
+              Convex schema expansion: users, agents, offers, trades, ratings, timeout_logs. Convex server functions for offers CRUD, trades, and user management (fully type-safe, no ORM). Convex real-time subscriptions for live offer updates pushed to all connected clients. Scale to 10-20 Coin-operated agents covering all V1 token pairs.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <p><strong>Phase 1 Deliverable:</strong> Full backend with wallet + identity + escrow + auth working on Solana devnet. 10-20 agents providing liquidity across all V1 token pairs.</p>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div id="v1-phase2">
+        <h2>4.2 Phase 2: Full Marketplace UI (Weeks 9-12)</h2>
+        <p>Phase 2 builds the consumer-facing product: the marketplace interface, agent configuration wizard, reputation system, live trade feed, and tutorial mode. By the end of Phase 2, the exchange is fully functional on devnet with agents providing liquidity and humans trading.</p>
+
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">1</div>
+              <div class="feature-card-title">Marketplace UI</div>
+            </div>
+            <div class="feature-card-body">
+              Full marketplace interface with hybrid layout: order-book-style table on desktop, card-based feed on mobile. Token pair selector tabs, price range filtering, reputation filtering, sort by best price / highest reputation / newest / largest amount. Jupiter reference price displayed for every offer.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">2</div>
+              <div class="feature-card-title">Buy/Sell Flows</div>
+            </div>
+            <div class="feature-card-body">
+              Complete trade execution: wallet approval, escrow lock, 15-minute timeout, atomic settlement. Trade detail screen showing fee breakdown, Jupiter comparison ("X% better than Jupiter"), and post-settlement Solana Explorer link. Post Offer screen for sellers to create new offers.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">3</div>
+              <div class="feature-card-title">Agent Configuration Wizard</div>
+            </div>
+            <div class="feature-card-body">
+              After completing their first manual trade, users see: "You just saved $X vs Jupiter. Want an agent to do this 24/7?" Simple wizard: daily spending cap (USDC), per-trade limit, approved token pairs (checkboxes), auto-accept threshold (% better than Jupiter). No developer knowledge required.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">4</div>
+              <div class="feature-card-title">Reputation System</div>
+            </div>
+            <div class="feature-card-body">
+              Reputation scoring engine: R = 0.15T + 0.20V + 0.25S + 0.40C. Post-trade rating system (1-5 stars). Four verification tiers: Unverified, Verified, Trusted, Established. Social verification via X account age, follower count, verified badge; Farcaster Neynar score for Farcaster users. Anti-gaming protections.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">5</div>
+              <div class="feature-card-title">Live Trade Feed + Tutorial Mode</div>
+            </div>
+            <div class="feature-card-body">
+              Real-time feed of completed trades (token pair, amount, price, .sol domains, timestamp) powered by Convex real-time subscriptions. Social proof showing the platform is active. Tutorial agent / demo mode with fake USDC so new users can learn without risk -- critical for non-technical user onboarding (2AM's concept).
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <p><strong>Phase 2 Deliverable:</strong> Fully functional exchange on Solana devnet with agents providing liquidity, marketplace UI, reputation system, agent configuration, and tutorial mode. Ready for internal testing.</p>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div id="v1-phase3">
+        <h2>4.3 Phase 3: Security, Beta &amp; Launch (Weeks 13-16)</h2>
+        <p>Phase 3 hardens the product for public launch: security review, geo-blocking, privacy features, performance optimization, mainnet migration, closed beta, and finally public launch with marketing push.</p>
+
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">1</div>
+              <div class="feature-card-title">Security &amp; Compliance</div>
+            </div>
+            <div class="feature-card-body">
+              Security review via peer review + audited library patterns (formal audit deferred to V2). US geo-blocking via Vercel Edge Middleware + disclaimers. Wyoming DAO LLC filing if not already completed. Per-trade escrow caps at launch with progressive trust limits.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">2</div>
+              <div class="feature-card-title">Privacy &amp; Performance</div>
+            </div>
+            <div class="feature-card-body">
+              Encrypted trade metadata (end-to-end). Profile visibility controls: trade as agent profile only, hiding human identity. Anonymous offer listing with .sol domain hidden until trade is initiated. Performance optimization: response caching, Helius RPC failover, Convex query optimization.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div class="feature-card-number">3</div>
+              <div class="feature-card-title">Mainnet Migration &amp; Launch</div>
+            </div>
+            <div class="feature-card-body">
+              Migrate full product from devnet to Solana mainnet. Deploy all Coin-operated agents on mainnet with funded wallets. Closed beta with 20-50 testers for 1-2 weeks. Bug fixes from beta feedback. UI/UX polish pass: animations, loading states, error handling, empty states, mobile responsiveness. Public launch + marketing push.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-success">
+          <p><strong>Phase 3 Deliverable:</strong> Public launch on Solana mainnet. Full product with auth, identity, marketplace, agents, reputation, privacy, and compliance. Open to all non-US users.</p>
+        </div>
+      </div>
+
+      <!-- V1 Success Metrics -->
+      <div id="v1-metrics">
+        <h2>4.4 V1 Success Metrics (First 30 Days Post-Launch)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Target</th>
+              <th>Why It Matters</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Daily GMV</td>
+              <td>$50K+</td>
+              <td>Core health metric; proves product-market fit</td>
+            </tr>
+            <tr>
+              <td>Active Agents</td>
+              <td>50+</td>
+              <td>Network effect; more agents = better prices for humans</td>
+            </tr>
+            <tr>
+              <td>Active Traders</td>
+              <td>100+</td>
+              <td>Demand side validation</td>
+            </tr>
+            <tr>
+              <td>Avg Settlement Time</td>
+              <td>&lt;2 seconds</td>
+              <td>UX quality; competitive advantage over CEX P2P</td>
+            </tr>
+            <tr>
+              <td>Settlement Success Rate</td>
+              <td>&gt;99%</td>
+              <td>Reliability and trust signal</td>
+            </tr>
+            <tr>
+              <td>Spread vs Jupiter</td>
+              <td>-0.05% to -0.1%</td>
+              <td>Value proposition proof: Coin beats the DEX</td>
+            </tr>
+            <tr>
+              <td>Escrow Timeout Rate</td>
+              <td>&lt;5%</td>
+              <td>Marketplace efficiency; low griefing</td>
+            </tr>
+            <tr>
+              <td>User Retention (D7)</td>
+              <td>&gt;30%</td>
+              <td>Product stickiness -- users come back</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 5. V2: GROWTH -->
+    <!-- ============================================================ -->
+    <div class="section page-break" id="v2">
+      <h1>5. V2: Growth (3-6 Months Post-Launch)</h1>
+      <p><span class="version-badge badge-v2">V2 -- 3-6 Months Post-Launch</span></p>
+      <p>V2 transitions Coin from a validated product to a growth-stage platform. The central objectives are expanding distribution (native mobile apps, fiat onramping), opening the platform to third-party agents, adding order matching infrastructure for higher-frequency trading, and building the social features that drive organic acquisition. V2 begins only after V1 launch metrics are confirmed -- specifically, consistent daily GMV above $50K and at least 100 active human traders.</p>
+
+      <h2 id="v2-features">5.1 Features</h2>
+
+      <div class="feature-grid">
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">1</div>
+            <div class="feature-card-title">Native iOS &amp; Android Apps</div>
+          </div>
+          <div class="feature-card-body">
+            React Native/Expo build leveraging the existing web codebase for maximum code reuse. Submitted to both App Store and Google Play.
+            <ul>
+              <li>Push notifications for trade confirmations, offer matches, agent activity, and price alerts</li>
+              <li>Biometric authentication (Face ID, Touch ID, fingerprint) for trade confirmation</li>
+              <li>Deep linking for sharing offers and profiles across social media</li>
+              <li>Offline-first architecture with local caching for offer browsing</li>
+              <li>Background agent status monitoring with persistent notification</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">2</div>
+            <div class="feature-card-title">Additional Social Integrations</div>
+          </div>
+          <div class="feature-card-body">
+            Expand social verification beyond X and Farcaster to YouTube, GitHub, Instagram, and TikTok. Each platform contributes to the reputation score's social verification component (S).
+            <ul>
+              <li><strong>GitHub:</strong> Verified developer identity -- critical for agent operators proving technical credibility</li>
+              <li><strong>YouTube:</strong> Creator economy trust signal -- channel age, subscriber count, content history</li>
+              <li><strong>Instagram:</strong> Real-world identity correlation for human traders</li>
+              <li><strong>TikTok:</strong> Emerging crypto audience -- younger demographic trust signals</li>
+              <li>All integrations use OAuth2 -- no password storage, revocable at any time</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">3</div>
+            <div class="feature-card-title">Fiat Onramping via MoonPay / Transak</div>
+          </div>
+          <div class="feature-card-body">
+            Fund wallets with fiat currency directly within the app. Apple Pay and Google Pay integration. Eliminates the need for users to already hold crypto -- zero to trading in under two minutes.
+            <ul>
+              <li>Apple Pay (iOS) and Google Pay (Android) for instant funding</li>
+              <li>Debit/credit card fallback for both platforms</li>
+              <li>Fiat to USDC conversion handled by MoonPay or Transak infrastructure</li>
+              <li>Dramatically reduces onboarding friction for non-crypto-native users</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">4</div>
+            <div class="feature-card-title">Third-Party Agent Marketplace</div>
+          </div>
+          <div class="feature-card-body">
+            Open the platform to developer-built agents. Any developer can deploy a custom trading agent on Coin using standardized frameworks. Key transition from Coin-operated liquidity to community-driven liquidity.
+            <ul>
+              <li><strong>ElizaOS plugin:</strong> Drop-in plugin for ElizaOS agents to connect to Coin's offer system</li>
+              <li><strong>Solana Agent Kit template:</strong> Starter template for building Coin-native agents</li>
+              <li>Agent verification process: code review, testnet validation, spending cap requirements</li>
+              <li>Agent marketplace: searchable directory with reputation scores, strategies, and performance history</li>
+              <li>Revenue: third-party agents keep their spreads, pay the 0.15% per-side exchange fee + 0.05% platform fee</li>
+              <li><strong>Virtuals integration</strong> for enhanced agent capabilities</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">5</div>
+            <div class="feature-card-title">Limit Orders &amp; Partial Fills</div>
+          </div>
+          <div class="feature-card-body">
+            Transition from manual-only offer selection to programmatic order matching. Large offers can be filled incrementally by multiple counterparties.
+            <ul>
+              <li>Automatic matching engine for offers meeting price/quantity criteria</li>
+              <li>Partial fills: buyers can take a portion of a large offer, not just full fill</li>
+              <li>Order types: Good-Til-Cancelled (GTC), Immediate-Or-Cancel (IOC), Fill-Or-Kill (FOK)</li>
+              <li>Matching is off-chain; settlement remains on-chain and atomic via escrow program</li>
+              <li>Manual offer selection still available for users who prefer the V1 browse-and-pick experience</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">6</div>
+            <div class="feature-card-title">Agent Analytics Dashboard</div>
+          </div>
+          <div class="feature-card-body">
+            Comprehensive analytics for agent operators to monitor performance, optimize strategies, and track profitability.
+            <ul>
+              <li>PnL tracking per agent: realized/unrealized gains, fee costs, net revenue</li>
+              <li>Volume statistics: daily/weekly/monthly trends, pair breakdowns</li>
+              <li>Counterparty map: visualization of which agents/humans your agent trades with most</li>
+              <li>Spread analysis: historical spreads vs Jupiter benchmarks with performance attribution</li>
+              <li>Inventory management: real-time token balance tracking across all agent wallets</li>
+              <li>Exportable reports (CSV, PDF) for tax and compliance</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">7</div>
+            <div class="feature-card-title">Dynamic Agent Pricing</div>
+          </div>
+          <div class="feature-card-body">
+            Upgrade from static offset pricing (V1) to dynamic pricing where agents adjust spreads based on real-time market conditions.
+            <ul>
+              <li>Volatility-aware: widen spreads during high volatility, tighten during calm markets</li>
+              <li>Volume-responsive: tighter spreads on high-volume pairs, wider on illiquid pairs</li>
+              <li>Inventory-driven: adjust prices to rebalance token holdings automatically</li>
+              <li>Available to both Coin-operated and third-party agents via configuration</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">8</div>
+            <div class="feature-card-title">Social &amp; Retention Features</div>
+          </div>
+          <div class="feature-card-body">
+            Features designed to drive organic acquisition and retention, championed by 2AM.
+            <ul>
+              <li><strong>PnL Sharing:</strong> Users share daily/weekly/monthly/yearly earnings on X, Farcaster, and other socials -- organic marketing through flex culture</li>
+              <li><strong>Referral Program:</strong> Users earn trading fee rebates for referring new traders. Tiered rewards based on referee's trading volume</li>
+              <li><strong>Verified Checkmark Paid Tier:</strong> Premium verification for enhanced trust signaling. Higher trade limits, priority offer placement, blue checkmark badge. Monthly subscription in USDC</li>
+              <li><strong>Creator Fees:</strong> Incentive mechanism for agents and humans -- retention through earning</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">9</div>
+            <div class="feature-card-title">Formal Smart Contract Audit</div>
+          </div>
+          <div class="feature-card-body">
+            Commission a formal audit of the escrow program from a reputable Solana audit firm (OtterSec, Neodyme, or similar). Estimated cost: $30,000-$80,000. Justified by V1 revenue and TVL growth.
+            <ul>
+              <li>Full audit of escrow Anchor program: create_offer, accept_offer, cancel_offer, claim_timeout, fee management</li>
+              <li>Token handling review: SPL token transfers, PDA derivation, rent-exempt account management</li>
+              <li>Formal verification of critical paths (atomic swap logic)</li>
+              <li>Public audit report published for transparency</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <h2 id="v2-metrics">5.2 V2 Success Metrics</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>V2 Target</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Daily GMV</td>
+            <td>$500K+</td>
+          </tr>
+          <tr>
+            <td>Active Agents (including third-party)</td>
+            <td>500+</td>
+          </tr>
+          <tr>
+            <td>Active Human Traders</td>
+            <td>2,000+</td>
+          </tr>
+          <tr>
+            <td>iOS / Android App Ratings</td>
+            <td>4+ stars</td>
+          </tr>
+          <tr>
+            <td>Third-Party Agents Registered</td>
+            <td>100+</td>
+          </tr>
+          <tr>
+            <td>Monthly Exchange Fee Revenue</td>
+            <td>$45K+ (at 0.3% of $500K daily)</td>
+          </tr>
+          <tr>
+            <td>Referral-Driven Signups</td>
+            <td>20%+ of new users from referrals</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 6. V3: SCALE -->
+    <!-- ============================================================ -->
+    <div class="section page-break" id="v3">
+      <h1>6. V3: Scale (6-12 Months Post-Launch)</h1>
+      <p><span class="version-badge badge-v3">V3 -- 6-12 Months Post-Launch</span></p>
+      <p>V3 transforms Coin from a growth-stage product into infrastructure capable of handling institutional volume and advanced trading patterns. The focus shifts from user acquisition to depth: multi-agent support, privacy via Light Protocol, streaming micropayments, institutional API access, and DEX aggregator integrations. V3 begins when V2 growth targets are sustained for at least 30 consecutive days.</p>
+
+      <h2 id="v3-features">6.1 Features</h2>
+
+      <div class="feature-grid">
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">1</div>
+            <div class="feature-card-title">Multi-Agent Support</div>
+          </div>
+          <div class="feature-card-body">
+            Users can own and operate multiple specialized agents, each with its own wallet, strategy, and identity. Enables sophisticated strategies requiring separation of concerns.
+            <ul>
+              <li>Agent types: market maker, arbitrageur, DCA bot, portfolio rebalancer, liquidation hunter</li>
+              <li>Per-agent wallets, configuration, and analytics -- fully isolated</li>
+              <li>Agent-to-agent communication within a user's fleet for coordinated strategies</li>
+              <li>Agent fleet dashboard: unified view of all agents' performance and positions</li>
+              <li>Up to 10 agents per user account (higher limits for Verified/Established tier users)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">2</div>
+            <div class="feature-card-title">Privacy via Light Protocol</div>
+          </div>
+          <div class="feature-card-body">
+            Evaluate and implement privacy-preserving settlement using Light Protocol or other Solana-native privacy solutions where trade amounts, counterparty identities, and token types are hidden from public view while remaining verifiable.
+            <ul>
+              <li>Evaluate Light Protocol for ZK compressed accounts on Solana</li>
+              <li>Selective disclosure: prove trade history for compliance without revealing details</li>
+              <li>ZK proofs for reputation verification -- prove tier status without revealing trade history</li>
+              <li>Privacy is opt-in: users choose between transparent and private settlement per trade</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">3</div>
+            <div class="feature-card-title">Streaming Micropayments</div>
+          </div>
+          <div class="feature-card-body">
+            Sub-cent continuous payment flows for high-frequency agent-to-agent trading. Built on x402 payment channels, enabling real-time settlement without per-transaction gas costs.
+            <ul>
+              <li>Payment channels between frequently-trading agent pairs</li>
+              <li>Real-time settlement streams with periodic on-chain finalization</li>
+              <li>Ideal for high-frequency market making where agents update quotes every second</li>
+              <li>Fallback to standard escrow settlement if channel capacity exceeded</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">4</div>
+            <div class="feature-card-title">Institutional API</div>
+          </div>
+          <div class="feature-card-body">
+            RESTful and WebSocket API for institutional agent operators managing large fleets and requiring programmatic access to the full exchange.
+            <ul>
+              <li>Bulk offer management: create, update, cancel hundreds of offers in a single API call</li>
+              <li>Programmatic trading via REST/WebSocket with sub-100ms response times</li>
+              <li>Webhook notifications for trade events, offer matches, settlement confirmations</li>
+              <li>Dedicated rate limits: 10,000 requests/minute for institutional tier</li>
+              <li>SLA guarantees: 99.9% uptime, &lt;200ms P99 latency</li>
+              <li>API key management with IP whitelisting and per-key permissions</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">5</div>
+            <div class="feature-card-title">DEX Aggregator Integrations</div>
+          </div>
+          <div class="feature-card-body">
+            Integrate with Jupiter aggregator so that when Coin's P2P offers provide better pricing than DEX pools, Jupiter routes trade flow through Coin. This is a critical growth lever.
+            <ul>
+              <li>Jupiter routing integration: Coin registered as a liquidity source for Solana token pairs</li>
+              <li>Jupiter queries Coin's offer book alongside AMM pools for optimal routing</li>
+              <li>Increases volume and visibility without requiring user acquisition spend</li>
+              <li>Coin agents effectively compete with Raydium/Orca pools on an equal footing</li>
+              <li>Additional aggregator integrations as they emerge on Solana</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">6</div>
+            <div class="feature-card-title">Cross-Platform Reputation Portability</div>
+          </div>
+          <div class="feature-card-body">
+            Make Coin reputation scores verifiable and portable outside the platform using on-chain attestations.
+            <ul>
+              <li>On-chain reputation attestations verifiable by any smart contract or dApp on Solana</li>
+              <li>Bidirectional: import reputation from other Solana protocols</li>
+              <li>Use cases: DeFi protocols can gate access based on Coin reputation tier</li>
+              <li>Reputation becomes a composable primitive in the broader Solana ecosystem</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">7</div>
+            <div class="feature-card-title">Advanced Agent AI</div>
+          </div>
+          <div class="feature-card-body">
+            Sophisticated AI-driven pricing and trading strategies for both Coin-operated and third-party agents.
+            <ul>
+              <li>Volatility-aware pricing: widen spreads during high volatility, tighten during calm markets</li>
+              <li>Volume-predictive algorithms: anticipate demand surges and pre-position inventory</li>
+              <li>Cross-pair correlation analysis: price SOL/USDC offers based on correlated pairs (JitoSOL, mSOL)</li>
+              <li>Machine learning models for optimal spread calculation trained on historical trade data</li>
+              <li>Strategy backtesting framework: test strategies against historical data before deployment</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">8</div>
+            <div class="feature-card-title">Tweet-Based Transactions</div>
+          </div>
+          <div class="feature-card-body">
+            X (Twitter) integration enabling users to initiate and complete P2P trades via tweet commands. Brings Coin's exchange to where crypto conversations already happen.
+            <ul>
+              <li>Command format: <code>@coin_exchange sell 10 SOL for 1350 USDC</code></li>
+              <li>Bot responds with offer link and confirmation details</li>
+              <li>Counterparties can accept offers via reply or direct link</li>
+              <li>Social trading feed: public offer activity visible on Coin's X account</li>
+              <li>Requires linked X account with Coin profile for authentication</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">9</div>
+            <div class="feature-card-title">Data Layer Strategy</div>
+          </div>
+          <div class="feature-card-body">
+            Agent trading data as a valuable asset for AI model training and market intelligence -- dEXploarer's vision for long-term value creation.
+            <ul>
+              <li>Anonymized, aggregated trading data available via API for research and ML training</li>
+              <li>Market microstructure insights: spread dynamics, agent behavior patterns, liquidity flows</li>
+              <li>Data partnerships with AI research institutions and trading firms</li>
+              <li>Privacy-preserving data sharing: aggregate insights without exposing individual trades</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <h2 id="v3-metrics">6.2 V3 Success Metrics</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>V3 Target</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Daily GMV</td>
+            <td>$5M+</td>
+          </tr>
+          <tr>
+            <td>Active Agents</td>
+            <td>5,000+</td>
+          </tr>
+          <tr>
+            <td>Active Human Traders</td>
+            <td>20,000+</td>
+          </tr>
+          <tr>
+            <td>Jupiter Routing Through Coin</td>
+            <td>Active on top 5 pairs</td>
+          </tr>
+          <tr>
+            <td>Monthly Revenue</td>
+            <td>Exceeds operational costs (profitability)</td>
+          </tr>
+          <tr>
+            <td>Multi-Agent Users</td>
+            <td>1,000+</td>
+          </tr>
+          <tr>
+            <td>Institutional API Users</td>
+            <td>50+</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 7. V4+: ECOSYSTEM -->
+    <!-- ============================================================ -->
+    <div class="section page-break" id="v4">
+      <h1>7. V4+: Ecosystem (12+ Months Post-Launch)</h1>
+      <p><span class="version-badge badge-v4">V4+ -- 12+ Months Post-Launch</span></p>
+      <p>V4 and beyond transition Coin from a standalone product to an open ecosystem and protocol layer. The platform becomes infrastructure that other applications build on. Token launch, governance, multi-chain expansion, and enterprise features are all contingent on proven product-market fit and sustainable revenue. Nothing in V4+ is guaranteed -- each feature is evaluated against demonstrated demand and strategic value at the time of implementation.</p>
+
+      <h2 id="v4-features">7.1 Features</h2>
+
+      <div class="feature-grid">
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">1</div>
+            <div class="feature-card-title">Multi-Chain Expansion</div>
+          </div>
+          <div class="feature-card-body">
+            Evaluate expansion beyond Solana to other high-activity chains, but only if demonstrated user demand exists. Solana remains the primary chain.
+            <ul>
+              <li>Candidate chains: Base (Coinbase ecosystem), Ethereum mainnet (institutional liquidity), Arbitrum (DeFi depth)</li>
+              <li>Evaluation criteria: minimum 1,000 user requests, clear agent operator demand, strategic partnership</li>
+              <li>Cross-chain settlement: evaluate Wormhole bridge infrastructure vs chain-native escrow contracts</li>
+              <li>Risk: multi-chain fragments liquidity -- only expand if net positive for total GMV</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">2</div>
+            <div class="feature-card-title">Yield &amp; Savings Features</div>
+          </div>
+          <div class="feature-card-body">
+            Passive earning products built on top of the P2P exchange. Users deposit tokens and earn yield generated by agent market-making activity.
+            <ul>
+              <li>Agent-powered yield vaults: deposit USDC, agents trade on your behalf, withdraw principal + earnings</li>
+              <li>Tiered risk/return profiles: conservative (low spread, high volume), aggressive (wider spread, higher risk)</li>
+              <li>Transparent performance history and fee structure</li>
+              <li>Non-custodial: user retains control of funds via smart contract</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">3</div>
+            <div class="feature-card-title">Token Launch (Post-PMF Only)</div>
+          </div>
+          <div class="feature-card-body">
+            If and when appropriate, launch a COIN token with clear utility. This is <strong>not</strong> a fundraising mechanism -- only justified with proven PMF, established revenue, and specific token utility.
+            <ul>
+              <li><strong>Governance:</strong> Token holders vote on reputation weights, listing criteria, fee adjustments, protocol upgrades</li>
+              <li><strong>Staking:</strong> Stake COIN to reduce exchange fees (0.3% to 0.2% for stakers)</li>
+              <li><strong>Fee Distribution:</strong> Portion of exchange fee revenue distributed to stakers</li>
+              <li>No token launch before $5M daily GMV and 6+ months of positive unit economics</li>
+              <li>Token distribution: community allocation &gt; team allocation, with multi-year vesting</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">4</div>
+            <div class="feature-card-title">Governance System</div>
+          </div>
+          <div class="feature-card-body">
+            Decentralized governance for protocol-level decisions. Transitions Coin from team-controlled parameters to community-governed infrastructure.
+            <ul>
+              <li>Reputation weight governance: community votes on T, V, S, C coefficient values</li>
+              <li>Token listing governance: community proposals and votes for adding/removing tokens</li>
+              <li>Fee adjustment governance: community can propose and vote on fee changes</li>
+              <li>Protocol upgrade governance: major feature releases require community approval</li>
+              <li>Tiered voting power based on COIN stake + reputation score + account age</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">5</div>
+            <div class="feature-card-title">Developer SDK</div>
+          </div>
+          <div class="feature-card-body">
+            Open SDK enabling any developer to embed Coin's P2P exchange functionality into their own applications. Coin becomes infrastructure, not just a destination.
+            <ul>
+              <li>TypeScript SDK for web and Node.js applications</li>
+              <li>React component library for embeddable trading widgets</li>
+              <li>White-label exchange components: offer feed, trade flow, wallet management</li>
+              <li>Plugin system for custom agent behaviors and strategies</li>
+              <li>Revenue share: SDK integrations generate exchange fees split with the integrating app</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">6</div>
+            <div class="feature-card-title">Enterprise &amp; Institutional Features</div>
+          </div>
+          <div class="feature-card-body">
+            Dedicated tooling for institutional operators managing large-scale agent fleets and trading operations.
+            <ul>
+              <li>Dedicated agent fleets with centralized management console</li>
+              <li>Compliance tools: transaction monitoring, suspicious activity reporting, audit trails</li>
+              <li>SLA guarantees: 99.99% uptime, dedicated support channel, priority incident response</li>
+              <li>Custom reporting: regulatory compliance reports, tax documentation, portfolio attribution</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">7</div>
+            <div class="feature-card-title">Desktop App</div>
+          </div>
+          <div class="feature-card-body">
+            Professional-grade desktop trading application for power users and institutional traders who need more screen real estate and advanced tooling.
+            <ul>
+              <li>Multi-monitor support: detachable panels for offer book, charts, analytics, and agent management</li>
+              <li>Advanced charting: candlestick charts, depth charts, spread visualization</li>
+              <li>Keyboard shortcuts for rapid trade execution and offer management</li>
+              <li>Built with Tauri for cross-platform compatibility (macOS first, then Windows/Linux)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-card-number">8</div>
+            <div class="feature-card-title">Custom x402 Facilitator</div>
+          </div>
+          <div class="feature-card-body">
+            Build Coin's own x402 facilitator to reduce dependency on external infrastructure and gain control over settlement fees, routing, and compliance.
+            <ul>
+              <li>Lower per-transaction fees by eliminating third-party facilitator margin</li>
+              <li>Custom settlement logic optimized for Coin's specific use cases on Solana</li>
+              <li>Direct integration with Coin's escrow programs for reduced latency</li>
+              <li>Maintain backward compatibility with existing x402 facilitators as fallback</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <h2 id="v4-metrics">7.2 V4+ Success Metrics</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>V4+ Target</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Daily GMV</td>
+            <td>$50M+</td>
+          </tr>
+          <tr>
+            <td>Active Agents</td>
+            <td>50,000+</td>
+          </tr>
+          <tr>
+            <td>Active Human Traders</td>
+            <td>100,000+</td>
+          </tr>
+          <tr>
+            <td>Annual Revenue</td>
+            <td>$54.7M+ (at target GMV x 0.3% fee)</td>
+          </tr>
+          <tr>
+            <td>Multi-Chain Support</td>
+            <td>2-3 chains if demand demonstrated</td>
+          </tr>
+          <tr>
+            <td>SDK Integrations</td>
+            <td>50+ apps using Coin SDK</td>
+          </tr>
+          <tr>
+            <td>Governance Participation</td>
+            <td>10%+ of token holders voting on proposals</td>
+          </tr>
+          <tr>
+            <td>Category Position</td>
+            <td>Category-defining platform for agent-native P2P exchange</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 8. FULL TIMELINE (GANTT CHART) -->
+    <!-- ============================================================ -->
+    <div class="section page-break" id="gantt">
+      <h1>8. Full Timeline (Gantt Chart)</h1>
+      <p>The following Gantt chart illustrates the complete product roadmap across approximately 24 months from the start of development. Phase boundaries are approximate and depend on achieving the success metrics defined for each version. The "Funding" milestone between MVP and V1 Phase 1 represents the critical fundraising gate.</p>
+
+      <div class="mermaid">
+gantt
+    title Coin Product Roadmap -- 24-Month Timeline
+    dateFormat YYYY-MM-DD
+    axisFormat %b %Y
+
+    section MVP (Wks 1-4)
+    Week 1 Escrow + Wallets         :mvp1, 2026-03-02, 7d
+    Week 2 Agent Runtime + Engine   :mvp2, after mvp1, 7d
+    Week 3 Web UI + Live Demo       :mvp3, after mvp2, 7d
+    Week 4 Polish + Mainnet         :mvp4, after mvp3, 7d
+    MVP Complete                    :milestone, mvpm, after mvp4, 0d
+
+    section Funding
+    Investor Meetings + Close       :fund, after mvp4, 21d
+    Funding Secured                 :milestone, fundm, after fund, 0d
+
+    section V1 Phase 1 (Wks 5-8)
+    Auth + Wallets + Identity       :v1a, after fund, 14d
+    Expanded Tokens + Backend       :v1b, after fund, 28d
+    10-20 Agents Deployed           :v1c, after v1a, 14d
+
+    section V1 Phase 2 (Wks 9-12)
+    Marketplace UI                  :v1d, after v1b, 14d
+    Agent Config + Reputation       :v1e, after v1b, 21d
+    Live Feed + Tutorial            :v1f, after v1d, 14d
+
+    section V1 Phase 3 (Wks 13-16)
+    Security + Geo-blocking         :v1g, after v1e, 14d
+    Privacy + Performance           :v1h, after v1f, 14d
+    Mainnet Migration               :v1i, after v1g, 7d
+    Closed Beta                     :v1j, after v1i, 10d
+    Public Launch                   :milestone, v1m, after v1j, 0d
+
+    section V2 Growth (Mo 5-10)
+    Native Mobile Apps              :v2a, after v1j, 56d
+    Third-Party Agent Marketplace   :v2b, after v1j, 70d
+    Fiat Onramping                  :v2c, after v2a, 28d
+    Limit Orders + Partial Fills    :v2d, after v1j, 42d
+    Agent Analytics + Dynamic       :v2e, after v2d, 42d
+    Social Features + Referrals     :v2f, after v1j, 56d
+    Smart Contract Audit            :v2g, after v1j, 42d
+
+    section V3 Scale (Mo 10-16)
+    Multi-Agent Support             :v3a, 2027-01-04, 56d
+    Privacy Light Protocol          :v3b, 2027-01-04, 84d
+    DEX Aggregator Integration      :v3c, 2027-02-01, 56d
+    Institutional API               :v3d, 2027-02-01, 70d
+    Streaming Micropayments         :v3e, 2027-03-15, 56d
+    Tweet-Based Transactions        :v3f, 2027-04-01, 42d
+
+    section V4+ Ecosystem (Mo 16+)
+    Token Launch Evaluation         :v4a, 2027-07-01, 84d
+    Governance System               :v4b, 2027-08-01, 70d
+    Multi-Chain Exploration         :v4c, 2027-09-01, 112d
+    Developer SDK                   :v4d, 2027-08-01, 84d
+    Enterprise Features             :v4e, 2027-10-01, 112d
+    Desktop App                     :v4f, 2027-11-01, 84d
+      </div>
+      <p class="diagram-caption">Figure 1 -- Full product roadmap showing MVP through V4+ across a 24-month development timeline starting March 2026.</p>
+
+      <div class="callout">
+        <p><strong>Timeline Note:</strong> The MVP phase (Weeks 1-4) runs at near-zero cost using free-tier infrastructure (only cost is ~$200 in mainnet seed capital for agents). A ~3-week funding period follows the MVP demo. V1 Phases 1-3 (Weeks 5-16) execute on the post-funding budget of $200-350K. V2 and beyond are funded by exchange fee revenue. Each phase gate is determined by achieving the prior phase's success metrics -- the team does not advance prematurely.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 9. REVENUE PROJECTIONS -->
+    <!-- ============================================================ -->
+    <div class="section page-break" id="revenue">
+      <h1>9. Revenue Projections</h1>
+      <p>Revenue projections are conservative estimates based on the 0.3% total exchange fee model (0.15% buyer + 0.15% seller + 0.05% agent platform fee on agent-facilitated trades). The projections assume steady growth gated by the success metrics at each phase. The long-term benchmark target is 15% of Axiom's daily revenue.</p>
+
+      <h3>Revenue Growth by Phase</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Phase</th>
+            <th>Daily GMV</th>
+            <th>Monthly Volume</th>
+            <th>Monthly Revenue (0.3%)</th>
+            <th>Agent Platform Fees</th>
+            <th>Total Monthly</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="version-badge badge-mvp" style="font-size:11px;padding:2px 8px;">MVP</span></td>
+            <td colspan="5" style="color:#6B7280; font-style:italic;">No revenue &mdash; demo phase for investor fundraising only</td>
+          </tr>
+          <tr>
+            <td><span class="version-badge badge-v1" style="font-size:11px;padding:2px 8px;">V1 Mo 1</span></td>
+            <td>$25K</td>
+            <td>$750K</td>
+            <td>$2,250</td>
+            <td>$375</td>
+            <td>$2,625</td>
+          </tr>
+          <tr>
+            <td><span class="version-badge badge-v1" style="font-size:11px;padding:2px 8px;">V1 Mo 3</span></td>
+            <td>$50K</td>
+            <td>$1.5M</td>
+            <td>$4,500</td>
+            <td>$750</td>
+            <td>$5,250</td>
+          </tr>
+          <tr>
+            <td><span class="version-badge badge-v2" style="font-size:11px;padding:2px 8px;">V2 Mo 6</span></td>
+            <td>$150K</td>
+            <td>$4.5M</td>
+            <td>$13,500</td>
+            <td>$2,250</td>
+            <td>$15,750</td>
+          </tr>
+          <tr>
+            <td><span class="version-badge badge-v2" style="font-size:11px;padding:2px 8px;">V2 Mo 9</span></td>
+            <td>$500K</td>
+            <td>$15M</td>
+            <td>$45,000</td>
+            <td>$7,500</td>
+            <td>$52,500</td>
+          </tr>
+          <tr>
+            <td><span class="version-badge badge-v3" style="font-size:11px;padding:2px 8px;">V3 Mo 12</span></td>
+            <td>$2M</td>
+            <td>$60M</td>
+            <td>$180,000</td>
+            <td>$30,000</td>
+            <td>$210,000</td>
+          </tr>
+          <tr>
+            <td><span class="version-badge badge-v3" style="font-size:11px;padding:2px 8px;">V3 Mo 16</span></td>
+            <td>$5M</td>
+            <td>$150M</td>
+            <td>$450,000</td>
+            <td>$75,000</td>
+            <td>$525,000</td>
+          </tr>
+          <tr>
+            <td><span class="version-badge badge-v4" style="font-size:11px;padding:2px 8px;">V4 Mo 20</span></td>
+            <td>$20M</td>
+            <td>$600M</td>
+            <td>$1,800,000</td>
+            <td>$300,000</td>
+            <td>$2,100,000</td>
+          </tr>
+          <tr>
+            <td><span class="version-badge badge-v4" style="font-size:11px;padding:2px 8px;">V4+ Mo 24</span></td>
+            <td>$50M</td>
+            <td>$1.5B</td>
+            <td>$4,500,000</td>
+            <td>$750,000</td>
+            <td>$5,250,000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Visual Revenue Trajectory</h3>
+      <div class="revenue-bar-chart">
+        <div class="rev-bar-row">
+          <div class="rev-bar-label">MVP</div>
+          <div class="rev-bar-track">
+            <div class="rev-bar-fill" style="width: 0%; background: #991B1B; min-width: 0px;"></div>
+          </div>
+          <div class="rev-bar-value" style="color:#9CA3AF; font-style:italic;">$0 (demo)</div>
+        </div>
+        <div class="rev-bar-row">
+          <div class="rev-bar-label">V1 Mo 1</div>
+          <div class="rev-bar-track">
+            <div class="rev-bar-fill" style="width: 2%; background: #2563EB; min-width: 50px;">$2.6K</div>
+          </div>
+        </div>
+        <div class="rev-bar-row">
+          <div class="rev-bar-label">V1 Mo 3</div>
+          <div class="rev-bar-track">
+            <div class="rev-bar-fill" style="width: 3%; background: #2563EB; min-width: 50px;">$5.3K</div>
+          </div>
+        </div>
+        <div class="rev-bar-row">
+          <div class="rev-bar-label">V2 Mo 6</div>
+          <div class="rev-bar-track">
+            <div class="rev-bar-fill" style="width: 5%; background: #059669; min-width: 55px;">$15.8K</div>
+          </div>
+        </div>
+        <div class="rev-bar-row">
+          <div class="rev-bar-label">V2 Mo 9</div>
+          <div class="rev-bar-track">
+            <div class="rev-bar-fill" style="width: 10%; background: #059669; min-width: 55px;">$52.5K</div>
+          </div>
+        </div>
+        <div class="rev-bar-row">
+          <div class="rev-bar-label">V3 Mo 12</div>
+          <div class="rev-bar-track">
+            <div class="rev-bar-fill" style="width: 20%; background: #D97706; min-width: 60px;">$210K</div>
+          </div>
+        </div>
+        <div class="rev-bar-row">
+          <div class="rev-bar-label">V3 Mo 16</div>
+          <div class="rev-bar-track">
+            <div class="rev-bar-fill" style="width: 35%; background: #D97706; min-width: 60px;">$525K</div>
+          </div>
+        </div>
+        <div class="rev-bar-row">
+          <div class="rev-bar-label">V4 Mo 20</div>
+          <div class="rev-bar-track">
+            <div class="rev-bar-fill" style="width: 60%; background: #7C3AED; min-width: 60px;">$2.1M</div>
+          </div>
+        </div>
+        <div class="rev-bar-row">
+          <div class="rev-bar-label">V4+ Mo 24</div>
+          <div class="rev-bar-track">
+            <div class="rev-bar-fill" style="width: 100%; background: #7C3AED;">$5.25M/mo</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Annualized Revenue at Scale Targets</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Daily GMV</th>
+            <th>Annual GMV</th>
+            <th>Annual Revenue (0.3%)</th>
+            <th>Annual Agent Platform Fees</th>
+            <th>Total Annual</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>V1 Launch (50 agents)</td>
+            <td>$50K</td>
+            <td>$18.25M</td>
+            <td>$54,750</td>
+            <td>$9,125</td>
+            <td>$63,875</td>
+          </tr>
+          <tr>
+            <td>V2 Growth (500 agents, 2K humans)</td>
+            <td>$500K</td>
+            <td>$182.5M</td>
+            <td>$547,500</td>
+            <td>$91,250</td>
+            <td>$638,750</td>
+          </tr>
+          <tr>
+            <td>V3 Scale (5K agents, 20K humans)</td>
+            <td>$5M</td>
+            <td>$1.825B</td>
+            <td>$5,475,000</td>
+            <td>$912,500</td>
+            <td>$6,387,500</td>
+          </tr>
+          <tr>
+            <td>V4+ Mature (50K agents, 100K humans)</td>
+            <td>$50M</td>
+            <td>$18.25B</td>
+            <td>$54,750,000</td>
+            <td>$9,125,000</td>
+            <td>$63,875,000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <p><strong>Revenue Model Note:</strong> Fee structure (0.3% total vs 0.5% total) is still an open team decision. The projections above use 2AM's 0.3% model (0.15% per side + 0.05% agent platform fee). The original PRD proposed 0.5% (0.25% per side). Lower fees attract volume but reduce per-trade revenue. The team will model both scenarios and decide before V1 launch.</p>
+      </div>
+
+      <h3>Revenue Comparison: 0.3% vs 0.5% Fee at V2 Scale ($500K Daily GMV)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Fee Model</th>
+            <th>Monthly Revenue</th>
+            <th>Annual Revenue</th>
+            <th>Trade-off</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>0.3% (2AM model)</td>
+            <td>$52,500</td>
+            <td>$630,000</td>
+            <td>More competitive vs DEXs; attracts higher volume</td>
+          </tr>
+          <tr>
+            <td>0.5% (original model)</td>
+            <td>$75,000</td>
+            <td>$900,000</td>
+            <td>Higher per-trade revenue; may reduce volume vs Jupiter</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 10. KEY MILESTONES -->
+    <!-- ============================================================ -->
+    <div class="section page-break" id="milestones">
+      <h1>10. Key Milestones</h1>
+      <p>The following milestones represent the critical inflection points in Coin's product journey. Each milestone is gated by the success metrics of its preceding phase. Dates are approximate and assume successful fundraising after the MVP demo.</p>
+
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Week 4 (March 2026)</div>
+          <div class="timeline-label">MVP Complete: Agents Trading on Mainnet</div>
+          <div class="timeline-desc">2-3 AI agents autonomously trading SOL/USDC on Solana mainnet with real funds. Web UI live at coin.family. Investor demo ready. This is the fundraising asset.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Week 7 (April 2026)</div>
+          <div class="timeline-label">Funding Secured</div>
+          <div class="timeline-desc">Seed funding closed based on working MVP demo. Development team transitions from bootstrapped to funded. Full product build begins.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Week 8 (May 2026)</div>
+          <div class="timeline-label">V1 Phase 1 Complete: Full Backend on Devnet</div>
+          <div class="timeline-desc">Privy auth, embedded wallets, .sol domain registration, agent identity cNFTs, 10-20 agents covering all V1 token pairs, full REST API operational on devnet.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Week 12 (June 2026)</div>
+          <div class="timeline-label">V1 Phase 2 Complete: Full Exchange on Devnet</div>
+          <div class="timeline-desc">Complete marketplace UI, agent configuration wizard, reputation system, live trade feed, tutorial mode. Fully functional exchange on devnet ready for internal testing.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Week 16 (July 2026)</div>
+          <div class="timeline-label">V1 Public Launch on Solana Mainnet</div>
+          <div class="timeline-desc">Security review complete, geo-blocking active, privacy features live, all agents on mainnet. Public launch after 2-week closed beta. Target: $50K daily GMV, 50+ agents, 100+ traders within 30 days.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Month 7 (October 2026)</div>
+          <div class="timeline-label">Native iOS &amp; Android Apps Live</div>
+          <div class="timeline-desc">App Store and Google Play submission with push notifications, biometric auth, and deep linking. Fiat onramping via MoonPay or Transak. Target: 4+ star ratings.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Month 8 (November 2026)</div>
+          <div class="timeline-label">Third-Party Agent Marketplace Opens</div>
+          <div class="timeline-desc">ElizaOS plugin and Solana Agent Kit templates available. Developer documentation published. Formal smart contract audit completed. Target: 100+ registered third-party agents.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Month 10 (January 2027)</div>
+          <div class="timeline-label">$500K Daily GMV -- V2 Targets Achieved</div>
+          <div class="timeline-desc">500+ active agents, 2,000+ human traders, referral program driving 20%+ of new signups. Monthly revenue exceeds $50K. V3 development begins.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Month 14 (May 2027)</div>
+          <div class="timeline-label">Jupiter Routing Through Coin</div>
+          <div class="timeline-desc">Jupiter aggregator actively routes trades through Coin when P2P offers beat DEX prices. Organic volume growth from aggregator traffic. Institutional API live with 50+ users.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Month 16 (July 2027)</div>
+          <div class="timeline-label">$5M Daily GMV -- V3 Targets Achieved</div>
+          <div class="timeline-desc">5,000+ active agents, 20,000+ human traders. Revenue exceeds operational costs -- profitability achieved. V4 ecosystem development begins.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Month 20+ (November 2027)</div>
+          <div class="timeline-label">Token Launch (Conditional)</div>
+          <div class="timeline-desc">Only if PMF is proven, revenue is sustainable, and clear token utility exists. Governance, staking, fee reduction mechanisms. NOT a fundraising event. Requires $5M+ daily GMV and 6+ months of positive unit economics.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-month">Month 24+ (March 2028)</div>
+          <div class="timeline-label">$50M Daily GMV -- Category Leader</div>
+          <div class="timeline-desc">Coin is the category-defining platform for agent-native P2P exchange. 50,000+ agents, 100,000+ humans. SDK powers third-party integrations. Self-sustaining revenue exceeding $63M annually.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- FOOTER -->
+    <!-- ============================================================ -->
+    <hr>
+
+    <div style="text-align: center; padding: 48px 0; color: #6B7280; font-size: 13px;">
+      <p><strong>COIN</strong> -- Product Roadmap (Solana)</p>
+      <p>coin.family</p>
+      <p style="margin-top: 16px;">Confidential -- Internal Use Only</p>
+      <p>February 2026</p>
+    </div>
+
+  </div>
+
+</body>
+</html>

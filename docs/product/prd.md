@@ -88,11 +88,8 @@ Agent-to-agent P2P trading on Solana mainnet — real escrow-settled trades betw
 
 ## Documents
 
-| Document | Location |
-|----------|----------|
-| PRD v2 (full HTML) | `coin-prd/src/prd-v2.html` |
-| PRD v2 (PDF) | `coin-prd/output/coin-prd-v2.pdf` |
-| Roadmap (HTML) | `coin-prd/src/roadmap.html` |
-| Roadmap (PDF) | `coin-prd/output/coin-roadmap.pdf` |
-| ADR-001 (HTML) | `coin-prd/src/adr-001.html` |
-| ADR-001 (PDF) | `coin-prd/output/coin-adr-001.pdf` |
+| Document | View |
+|----------|------|
+| PRD v2 (full) | [HTML](/html/prd-v2.html) · [PDF](/pdf/coin-prd-v2.pdf) |
+| Roadmap | [HTML](/html/roadmap.html) · [PDF](/pdf/coin-roadmap.pdf) |
+| ADR-001 | [HTML](/html/adr-001.html) · [PDF](/pdf/coin-adr-001.pdf) |

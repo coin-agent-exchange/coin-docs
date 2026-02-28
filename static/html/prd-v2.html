@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coin — Product Requirements Document v2 (Solana)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#DBEAFE',
+        primaryTextColor: '#111827',
+        primaryBorderColor: '#2563EB',
+        lineColor: '#2563EB',
+        secondaryColor: '#F9FAFB',
+        tertiaryColor: '#DBEAFE'
+      }
+    });
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #111827;
+      background: #FFFFFF;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+    /* Cover */
+    .cover {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; text-align: center; padding: 80px 24px;
+    }
+    .cover-logo { font-size: 72px; font-weight: 700; color: #2563EB; letter-spacing: -2px; margin-bottom: 24px; }
+    .cover-subtitle { font-size: 24px; font-weight: 500; color: #111827; margin-bottom: 12px; }
+    .cover-url { font-size: 18px; color: #6B7280; margin-bottom: 8px; }
+    .cover-date { font-size: 16px; color: #6B7280; margin-bottom: 80px; }
+    .cover-confidential {
+      font-size: 13px; font-weight: 600; color: #6B7280; text-transform: uppercase;
+      letter-spacing: 2px; border-top: 1px solid #E5E7EB; padding-top: 24px;
+    }
+
+    /* Typography */
+    h1 { font-size: 28px; font-weight: 700; color: #111827; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 3px solid #2563EB; }
+    h2 { font-size: 22px; font-weight: 700; color: #111827; margin-top: 40px; margin-bottom: 16px; }
+    h3 { font-size: 18px; font-weight: 600; color: #1E40AF; margin-top: 32px; margin-bottom: 12px; }
+    h4 { font-size: 16px; font-weight: 600; color: #111827; margin-top: 24px; margin-bottom: 8px; }
+    p { margin-bottom: 16px; }
+    ul, ol { margin-bottom: 16px; padding-left: 24px; }
+    li { margin-bottom: 6px; }
+    a { color: #2563EB; text-decoration: none; }
+    a:hover { color: #1E40AF; text-decoration: underline; }
+    code { background: #F3F4F6; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', 'Fira Code', monospace; }
+    hr { border: none; border-top: 1px solid #E5E7EB; margin: 48px 0; }
+    strong { font-weight: 600; }
+
+    /* Sections */
+    .section { padding: 48px 0; }
+    .page-break { page-break-before: always; }
+
+    /* TOC */
+    .toc { padding: 48px 0; }
+    .toc ol { list-style: none; counter-reset: toc; padding: 0; }
+    .toc > ol > li { counter-increment: toc; margin-bottom: 10px; }
+    .toc > ol > li > a { font-size: 16px; font-weight: 500; display: flex; align-items: baseline; gap: 10px; }
+    .toc > ol > li > a::before { content: counter(toc) "."; color: #2563EB; font-weight: 700; min-width: 28px; }
+    .toc > ol > li > ol { list-style: none; padding-left: 38px; margin-top: 6px; }
+    .toc > ol > li > ol > li { margin-bottom: 4px; }
+    .toc > ol > li > ol > li > a { font-size: 14px; color: #6B7280; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+    thead th { background: #2563EB; color: #FFFFFF; font-weight: 600; padding: 12px 16px; text-align: left; }
+    thead th:first-child { border-top-left-radius: 8px; }
+    thead th:last-child { border-top-right-radius: 8px; }
+    tbody td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+    tbody tr:nth-child(even) { background: #F9FAFB; }
+
+    /* Callout */
+    .callout { background: #DBEAFE; border-left: 4px solid #2563EB; border-radius: 0 8px 8px 0; padding: 20px 24px; margin: 24px 0; }
+    .callout p { margin-bottom: 8px; }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout-warning { background: #FEF3C7; border-left-color: #D97706; }
+    .callout-danger { background: #FEE2E2; border-left-color: #DC2626; }
+
+    /* Out of scope box */
+    .out-of-scope { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; padding: 24px 28px; margin: 24px 0; }
+    .out-of-scope-item { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; font-size: 14px; }
+    .out-of-scope-item:last-child { margin-bottom: 0; }
+    .oos-x { color: #DC2626; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+
+    /* Severity badges */
+    .sev-high { background: #FEE2E2; color: #991B1B; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .sev-med { background: #FEF3C7; color: #92400E; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .sev-low { background: #D1FAE5; color: #065F46; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+    /* Mermaid */
+    .mermaid { margin: 32px 0; text-align: center; }
+    .diagram-caption { text-align: center; font-size: 13px; color: #6B7280; margin-top: 8px; font-style: italic; }
+
+    /* Wireframe phone frame */
+    .wireframe-row { display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; margin: 32px 0; }
+    .phone-frame {
+      width: 375px; min-height: 667px; background: #FFFFFF; border: 2px solid #1F2937;
+      border-radius: 36px; padding: 48px 16px 32px; position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12); flex-shrink: 0;
+    }
+    .phone-frame::before {
+      content: ''; position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 24px; background: #1F2937; border-radius: 12px;
+    }
+    .phone-screen { height: 100%; overflow: hidden; font-size: 14px; line-height: 1.5; }
+    .phone-screen * { margin: 0; }
+
+    /* Wireframe internal styles */
+    .wf-header { text-align: center; padding: 16px 0 12px; border-bottom: 1px solid #E5E7EB; margin-bottom: 16px; }
+    .wf-logo { font-size: 28px; font-weight: 700; color: #2563EB; }
+    .wf-tagline { font-size: 12px; color: #6B7280; margin-top: 4px; }
+    .wf-btn {
+      display: block; width: 100%; padding: 14px; border-radius: 12px; text-align: center;
+      font-weight: 600; font-size: 15px; border: none; cursor: pointer; margin-bottom: 12px;
+    }
+    .wf-btn-primary { background: #2563EB; color: #FFFFFF; }
+    .wf-btn-secondary { background: #F3F4F6; color: #111827; }
+    .wf-btn-outline { background: transparent; border: 2px solid #2563EB; color: #2563EB; }
+    .wf-input {
+      width: 100%; padding: 12px 14px; border: 1px solid #D1D5DB; border-radius: 10px;
+      font-size: 14px; margin-bottom: 12px; background: #F9FAFB;
+    }
+    .wf-label { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px; display: block; }
+    .wf-card {
+      background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 12px;
+      padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .wf-nav {
+      display: flex; justify-content: space-around; border-top: 1px solid #E5E7EB;
+      padding: 10px 0 0; margin-top: auto; position: absolute; bottom: 32px; left: 16px; right: 16px;
+    }
+    .wf-nav-item { text-align: center; font-size: 10px; color: #6B7280; }
+    .wf-nav-item.active { color: #2563EB; font-weight: 600; }
+    .wf-nav-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+    .wf-section-title { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 12px; }
+    .wf-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 10px;
+      font-weight: 600; vertical-align: middle;
+    }
+    .wf-badge-agent { background: #DBEAFE; color: #1E40AF; }
+    .wf-badge-human { background: #D1FAE5; color: #065F46; }
+    .wf-badge-tier { background: #EDE9FE; color: #5B21B6; }
+    .wf-spread-good { color: #059669; font-weight: 600; font-size: 12px; }
+    .wf-spread-bad { color: #DC2626; font-weight: 600; font-size: 12px; }
+    .wf-tab-row { display: flex; gap: 0; margin-bottom: 12px; border-bottom: 2px solid #E5E7EB; }
+    .wf-tab { padding: 8px 14px; font-size: 12px; font-weight: 500; color: #6B7280; cursor: pointer; }
+    .wf-tab.active { color: #2563EB; border-bottom: 2px solid #2563EB; margin-bottom: -2px; font-weight: 600; }
+    .wf-price-ref { background: #F9FAFB; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #6B7280; margin-bottom: 12px; text-align: center; }
+    .wf-divider { border: none; border-top: 1px solid #E5E7EB; margin: 12px 0; }
+    .wf-stat { text-align: center; }
+    .wf-stat-value { font-size: 20px; font-weight: 700; color: #2563EB; }
+    .wf-stat-label { font-size: 10px; color: #6B7280; }
+    .wf-toggle-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .wf-toggle { flex: 1; padding: 10px; border-radius: 10px; text-align: center; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .wf-toggle.active { background: #2563EB; color: #FFF; }
+    .wf-toggle.inactive { background: #F3F4F6; color: #6B7280; }
+    .wf-check-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+    .wf-checkbox { width: 18px; height: 18px; border: 2px solid #D1D5DB; border-radius: 4px; flex-shrink: 0; display: inline-block; }
+    .wf-checkbox.checked { background: #2563EB; border-color: #2563EB; position: relative; }
+    .wf-wallet-section { background: #F9FAFB; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .wf-wallet-title { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px; }
+    .wf-token-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; }
+    .wf-token-name { font-weight: 500; }
+    .wf-token-bal { color: #6B7280; }
+    .wf-small-btn { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; }
+
+    /* Desktop wireframe frame */
+    .desktop-frame {
+      width: 100%; max-width: 780px; min-height: 480px; background: #FFFFFF; border: 2px solid #1F2937;
+      border-radius: 12px; padding: 0; position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12); flex-shrink: 0; overflow: hidden;
+    }
+    .desktop-frame-bar {
+      background: #1F2937; padding: 8px 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .desktop-frame-dot {
+      width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+    }
+    .desktop-frame-dot.red { background: #EF4444; }
+    .desktop-frame-dot.yellow { background: #F59E0B; }
+    .desktop-frame-dot.green { background: #10B981; }
+    .desktop-frame-url {
+      flex: 1; background: #374151; border-radius: 6px; padding: 4px 12px;
+      font-size: 11px; color: #9CA3AF; margin-left: 8px;
+    }
+    .desktop-screen { padding: 24px; font-size: 14px; line-height: 1.5; }
+    .desktop-screen * { margin: 0; }
+
+    /* Desktop wireframe table styles */
+    .wf-desk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .wf-desk-table thead th {
+      background: #F9FAFB; padding: 10px 12px; text-align: left; font-weight: 600;
+      font-size: 12px; color: #6B7280; border-bottom: 2px solid #E5E7EB;
+    }
+    .wf-desk-table tbody td {
+      padding: 12px; border-bottom: 1px solid #F3F4F6; vertical-align: middle;
+    }
+    .wf-desk-table tbody tr:hover { background: #F9FAFB; }
+
+    /* Print */
+    @media print {
+      body { font-size: 12px; }
+      .cover { min-height: auto; padding: 140px 24px; page-break-after: always; }
+      .toc { page-break-after: always; }
+      .page-break { page-break-before: always; }
+      h1, h2, h3 { page-break-after: avoid; }
+      table, .callout, .out-of-scope { page-break-inside: avoid; }
+      .mermaid { page-break-inside: avoid; }
+      .phone-frame { box-shadow: none; border: 1px solid #D1D5DB; page-break-inside: avoid; }
+      .desktop-frame { box-shadow: none; border: 1px solid #D1D5DB; page-break-inside: avoid; }
+      .wireframe-row { page-break-inside: avoid; }
+      a { color: #2563EB; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <div class="cover-logo">COIN</div>
+  <div class="cover-subtitle">Product Requirements Document &mdash; v2 (Solana)</div>
+  <div class="cover-url">coin.family</div>
+  <div class="cover-date">February 2026</div>
+  <div class="cover-confidential">Confidential &mdash; Internal Use Only</div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="container">
+  <div class="toc">
+    <h1>Table of Contents</h1>
+    <ol>
+      <li><a href="#exec-summary">Executive Summary</a></li>
+      <li><a href="#problem">Problem Statement</a></li>
+      <li><a href="#solution">Solution Overview</a></li>
+      <li><a href="#users">Target Users</a></li>
+      <li><a href="#features">V1 MVP Feature Specification</a>
+        <ol>
+          <li><a href="#identity">Identity &amp; Trust System</a></li>
+          <li><a href="#wallets">Wallet Infrastructure</a></li>
+          <li><a href="#trading">Trading Mechanics</a></li>
+          <li><a href="#agent-config">Agent Configuration</a></li>
+          <li><a href="#marketplace">Marketplace Interface</a></li>
+          <li><a href="#live-feed">Live Trade Feed</a></li>
+          <li><a href="#tutorial">Tutorial Agent / Demo Mode</a></li>
+          <li><a href="#privacy">Privacy</a></li>
+          <li><a href="#platform">Platform</a></li>
+          <li><a href="#revenue">Revenue Model</a></li>
+        </ol>
+      </li>
+      <li><a href="#cold-start">Coin-Operated Market Making Agents</a></li>
+      <li><a href="#out-of-scope">V1 Explicitly Out of Scope</a></li>
+      <li><a href="#architecture">System Architecture</a></li>
+      <li><a href="#wireframes">Wireframes</a></li>
+      <li><a href="#compliance">Compliance &amp; Legal Strategy</a></li>
+      <li><a href="#contracts">Smart Contract Design</a></li>
+      <li><a href="#timeline">Development Timeline (MVP Phase 1 &amp; Phase 2)</a></li>
+      <li><a href="#metrics">Success Metrics</a></li>
+      <li><a href="#risks">Risks &amp; Mitigations</a></li>
+      <li><a href="#open-questions">Open Questions</a></li>
+      <li><a href="#references">References</a></li>
+    </ol>
+  </div>
+</div>
+
+<!-- SECTION 1: EXECUTIVE SUMMARY -->
+<div class="section page-break" id="exec-summary">
+  <h1>1. Executive Summary</h1>
+  <p><strong>Coin</strong> is a peer-to-peer token exchange built on Solana where humans and AI agents buy and sell crypto tokens directly with each other. The marketplace has two sides &mdash; a <strong>buyers market</strong> and a <strong>sellers market</strong> &mdash; where counterparties find each other, agree on exact prices, and settle trades atomically via an on-chain escrow program. All in under two seconds at near-zero cost.</p>
+
+  <p>Three marketplace types coexist: Human-to-Human (H2H), Human-to-Agent (H2A), and Agent-to-Agent (A2A). Humans trade directly with each other just like any P2P exchange. AI agents serve as always-on market makers, quoting tighter spreads than AMM pools, running 24/7, and providing continuous liquidity alongside human traders. The result: zero slippage, zero MEV extraction, and fixed-price execution for every trade. Coin is to onchain token trading what Binance P2P and Paxful are to fiat-to-crypto &mdash; except entirely onchain, settling in seconds, and treating both humans and AI agents as first-class participants.</p>
+
+  <p>Coin is consumer-first. Non-technical users who have never touched DeFi can create an account, own an earning agent that trades on their behalf, and withdraw profits &mdash; without understanding the crypto underneath. No KYC required; pure onchain settlement is the competitive moat. The platform geo-blocks US IPs following the compliance playbook proven by Axiom, Pump.fun, and dYdX.</p>
+
+  <div class="callout">
+    <p><strong>MVP Phase 1 (4 weeks, near-zero cost):</strong> Agent-to-agent P2P trading on Solana mainnet &mdash; real escrow-settled trades between AI agents demonstrating the core value proposition. Agents posting offers, accepting offers, settling via escrow, and beating Jupiter prices. This is the fundraising asset to put in front of VCs. All infrastructure runs on free tiers; only cost is ~$200 in mainnet seed capital.</p>
+    <p><strong>MVP Phase 2 (~3 months, $200&ndash;350K post-funding):</strong> Full product build with Privy auth, SNS identity, reputation system, consumer UX, 14 listed tokens, and 10&ndash;20 Coin-operated market-making agents culminating in public launch.</p>
+    <p><strong>Team:</strong> 5 equal partners (20% each) &mdash; satsbased, wes, 2AM, dEXploarer, 0xJ0hnny.eth &mdash; aligned and building bootstrapped. Total timeline: ~4 months (1 month MVP Phase 1 + 3 months MVP Phase 2).</p>
+  </div>
+</div>
+
+<hr>
+
+<!-- SECTION 2: PROBLEM STATEMENT -->
+<div class="section page-break" id="problem">
+  <h1>2. Problem Statement</h1>
+
+  <h3>DEX Slippage Costs Real Money</h3>
+  <p>AMM-based DEXs price-impact every trade. A $10K swap on a mid-liquidity pool loses 0.5&ndash;2% to slippage. Aggregate slippage costs across crypto reached <strong>$2.7 billion in 2024</strong>. Traders accept this because no alternative exists onchain.</p>
+
+  <h3>MEV Extraction Steals Value</h3>
+  <p>Sandwich attacks and front-running on Solana (via Jito bundles) systematically extract value from DEX traders. Every swap through Jupiter or Raydium is visible in the mempool and vulnerable to MEV bots that profit at the trader's expense.</p>
+
+  <h3>No Price Negotiation on AMMs</h3>
+  <p>AMM curves dictate price. Traders take whatever the pool gives. There is no mechanism for two parties to agree on exact terms, making large block trades particularly expensive.</p>
+
+  <h3>No Reputation or Counterparty Trust</h3>
+  <p>DEX trades are anonymous and atomic &mdash; no relationship, no trust accumulation, no way to prefer reliable counterparties. Every trade is a one-off interaction with an impersonal liquidity pool.</p>
+
+  <h3>Existing P2P Exchanges Don't Serve This Market</h3>
+  <p>Binance P2P, Paxful, and LocalBitcoins are fiat-to-crypto only, require KYC, have slow 15&ndash;60 minute settlement windows, and don't support AI agents. They solve a different problem (fiat onramp) for a different user.</p>
+
+  <h3>AI Agents Have No P2P Venue</h3>
+  <p>AI agents are actively trading tokens on Solana today but are forced through DEXs and Jupiter aggregator &mdash; suffering the same slippage and MEV as human traders. There is no P2P marketplace where agents can post offers, negotiate prices, and build trading relationships.</p>
+
+  <h3>Non-Technical Users Are Excluded</h3>
+  <p>Non-technical users have no way to participate in agent-driven market making without understanding DeFi mechanics, wallet management, and trading strategies. The earning potential of AI agents is locked behind technical barriers.</p>
+
+  <h3>OTC Desks Serve Institutions Only</h3>
+  <p>OTC desks require trusted intermediaries, high minimums ($100K+), and serve institutions only. Retail traders with $500&ndash;$50K trades have no fixed-price execution option.</p>
+</div>
+
+<hr>
+
+<!-- SECTION 3: SOLUTION OVERVIEW -->
+<div class="section page-break" id="solution">
+  <h1>3. Solution Overview</h1>
+
+  <p>Coin is a P2P token exchange where sellers post offers and buyers take them. AI agents operate as first-class participants &mdash; market makers providing 24/7 liquidity with tighter spreads than AMM pools. Settlement is trustless and atomic via a Solana escrow program using a two-phase commit pattern: the seller locks tokens in an escrow PDA, the buyer sends payment, and the program releases both sides simultaneously.</p>
+
+  <p>Identity is anchored on-chain via SNS (.sol domains) and agent identity cNFTs (Metaplex Bubblegum compressed NFTs). A reputation system builds trust over time based on trade history, volume, social verification, and counterparty ratings. Three marketplace types are supported:</p>
+  <ul>
+    <li><strong>Agent-to-Agent (A2A):</strong> Agents trading autonomously with other agents &mdash; the always-on liquidity backbone.</li>
+    <li><strong>Human-to-Agent / Agent-to-Human (H2A/A2H):</strong> Humans trading against agent offers, or agents accepting human offers.</li>
+    <li><strong>Human-to-Human (H2H):</strong> Direct P2P trades between human users &mdash; the classic P2P exchange experience.</li>
+  </ul>
+  <p>All three marketplace types use the same escrow, settlement, and reputation infrastructure. The architecture treats humans and agents as equal participants from day one.</p>
+
+  <p>The exchange fee (0.3&ndash;0.5% per trade, split between buyer and seller) is deducted at settlement. Built on Solana for sub-second finality at fractions of a cent per transaction. The consumer-first UX hides all crypto complexity from non-technical users.</p>
+
+  <h3>Competitive Positioning</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Coin (P2P)</th>
+        <th>Jupiter / Raydium</th>
+        <th>Binance P2P</th>
+        <th>OTC Desks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Settlement</strong></td>
+        <td>&lt;2 seconds (Solana escrow)</td>
+        <td>&lt;2 seconds (AMM)</td>
+        <td>15&ndash;60 minutes</td>
+        <td>Hours to days</td>
+      </tr>
+      <tr>
+        <td><strong>Slippage</strong></td>
+        <td>Zero (fixed price)</td>
+        <td>0.1&ndash;2%+ (AMM curve)</td>
+        <td>Zero (negotiated)</td>
+        <td>Zero (negotiated)</td>
+      </tr>
+      <tr>
+        <td><strong>MEV Risk</strong></td>
+        <td>None</td>
+        <td>High (sandwich attacks)</td>
+        <td>None</td>
+        <td>None</td>
+      </tr>
+      <tr>
+        <td><strong>Asset Type</strong></td>
+        <td>Token-to-token</td>
+        <td>Token-to-token</td>
+        <td>Fiat-to-crypto only</td>
+        <td>Any</td>
+      </tr>
+      <tr>
+        <td><strong>KYC Required</strong></td>
+        <td>No</td>
+        <td>No</td>
+        <td>Yes</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td><strong>Trade Minimum</strong></td>
+        <td>$1</td>
+        <td>~$0.01</td>
+        <td>$10+</td>
+        <td>$100K+</td>
+      </tr>
+      <tr>
+        <td><strong>AI Agent Support</strong></td>
+        <td>First-class</td>
+        <td>Via SDK only</td>
+        <td>None</td>
+        <td>None</td>
+      </tr>
+      <tr>
+        <td><strong>Custody</strong></td>
+        <td>Non-custodial (escrow)</td>
+        <td>Non-custodial</td>
+        <td>Custodial</td>
+        <td>Custodial</td>
+      </tr>
+      <tr>
+        <td><strong>Reputation</strong></td>
+        <td>On-chain reputation</td>
+        <td>None</td>
+        <td>Platform ratings</td>
+        <td>Relationship-based</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- SECTION 4: TARGET USERS -->
+<div class="section page-break" id="users">
+  <h1>4. Target Users</h1>
+
+  <h2>4.1 Primary: Non-Technical Users (Consumer)</h2>
+  <p>People who want to earn from AI agents without understanding crypto. They create an account, own an agent that earns for them passively, and can withdraw profits. The crypto infrastructure is invisible. This is the largest addressable market. As the team articulated: <em>"showing people that don't know how to earn from using AI agents by giving them earning agents."</em></p>
+
+  <h2>4.2 Primary: Crypto-Native Traders on Solana</h2>
+  <p>Active traders who use Jupiter, Raydium, and Orca daily. They want better execution &mdash; less slippage, no MEV, fixed prices for larger trades. They will use Coin when agents offer better prices than DEXs, which they structurally can by quoting tighter spreads than AMM pools.</p>
+
+  <h2>4.3 Secondary: AI Agent Operators</h2>
+  <p>Developers and power users who want to deploy trading agents. They understand market making and want to earn spread. One agent per user in V1. They bring their own strategies and contribute to platform liquidity.</p>
+
+  <h2>4.4 Secondary: OTC Traders</h2>
+  <p>People trading large blocks ($10K+) who currently suffer significant price impact on DEXs. P2P gives them fixed-price execution regardless of order size &mdash; a $100K trade settles at the same price as a $100 trade.</p>
+
+  <h2>4.5 Platform Participant: Coin-Operated Agents</h2>
+  <p>At launch, 10&ndash;20 platform-operated market-making agents bootstrap liquidity. These quote all supported token pairs at 0.05&ndash;0.1% better than Jupiter prices, operate at a capped monthly loss budget as a marketing cost, and will be phased out as third-party agents provide sufficient liquidity.</p>
+</div>
+
+<hr>
+
+<!-- SECTION 5: V1 MVP FEATURE SPECIFICATION -->
+<div class="section page-break" id="features">
+  <h1>5. V1 MVP Feature Specification</h1>
+
+  <h2 id="identity">5.1 Identity &amp; Trust System</h2>
+
+  <h3>5.1.1 Onchain Identity</h3>
+  <ul>
+    <li><strong>SNS Registration:</strong> Every user registers a <code>.sol</code> domain (via Bonfida / Solana Name Service) during onboarding. Users who already have one can link it.</li>
+    <li><strong>Social Verification:</strong> Link X (Twitter) and/or Farcaster account for social reputation score. Privy supports both.</li>
+    <li><strong>Agent Creation:</strong> Every user gets one agent with a separate <code>.sol</code> domain (e.g., <code>alice-agent.sol</code>) created during onboarding.</li>
+    <li><strong>Agent Identity NFT:</strong> Agent registered on-chain with Metaplex cNFT (compressed NFT) bound to <code>.sol</code> domain.</li>
+  </ul>
+
+  <h3>5.1.2 Reputation Score</h3>
+  <p>Every participant (human and agent) has a reputation score:</p>
+  <div class="callout">
+    <p><strong>Formula:</strong> R = 0.15T + 0.20V + 0.25S + 0.40C</p>
+    <p><strong>T</strong> = Trade Count: Total completed trades (normalized 0&ndash;1 against platform median)</p>
+    <p><strong>V</strong> = Volume: Total USDC-equivalent volume (log-scaled to prevent whale dominance)</p>
+    <p><strong>S</strong> = Social Verification: X account age (40%), follower count (30%), verified badge (30%). For Farcaster: Neynar score. For agents: on-chain identity score.</p>
+    <p><strong>C</strong> = Counterparty Ratings: Average 1&ndash;5 star ratings (weighted by recency; last 30 trades count most)</p>
+  </div>
+
+  <h3>5.1.3 Verification Tiers</h3>
+  <table>
+    <thead>
+      <tr><th>Tier</th><th>Requirements</th><th>Benefits</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Unverified</td><td>New account, no trades</td><td>Browse offers; limited to accepting offers &le;$100</td></tr>
+      <tr><td>Verified</td><td>X or Farcaster linked + 5 completed trades</td><td>Create and accept offers up to $5,000</td></tr>
+      <tr><td>Trusted</td><td>20+ trades, 4.0+ avg rating, 30+ day account</td><td>Unlimited trade size; visible trust badge</td></tr>
+      <tr><td>Established</td><td>100+ trades, 4.5+ avg rating, $50K+ volume</td><td>Premium badge; featured in marketplace; priority support</td></tr>
+    </tbody>
+  </table>
+  <p>Anti-gaming: social verification prevents pure wash-trading from inflating reputation.</p>
+
+  <h2 id="wallets">5.2 Wallet Infrastructure</h2>
+  <table>
+    <thead>
+      <tr><th>Feature</th><th>Human Wallet</th><th>Agent Wallet</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Provider</strong></td><td>Embedded wallet via Privy (Solana keypair)</td><td>Programmatic Solana keypair</td></tr>
+      <tr><td><strong>Key Management</strong></td><td>MPC or enclave-based via Privy</td><td>Spending limits enforced by escrow program</td></tr>
+      <tr><td><strong>Provisioning</strong></td><td>Auto-created on signup via Privy</td><td>Created when user enables agent</td></tr>
+      <tr><td><strong>Funding</strong></td><td>User deposits directly or transfers from external wallet</td><td>User transfers from human wallet</td></tr>
+      <tr><td><strong>Control</strong></td><td>Full user control, approval required per tx</td><td>Autonomous within configured limits</td></tr>
+      <tr><td><strong>Recovery</strong></td><td>Social recovery via Privy auth</td><td>Owner can revoke/reset from human wallet</td></tr>
+    </tbody>
+  </table>
+  <div class="callout callout-warning">
+    <p><strong>Open Decision:</strong> Wallet provider choice (Privy embedded vs Phantom embedded vs Turnkey vs Crossmint) to be finalized during MVP Phase 2a spikes.</p>
+  </div>
+
+  <h2 id="trading">5.3 Trading Mechanics</h2>
+
+  <h3>5.3.1 Listed Tokens (V1 &mdash; Day One)</h3>
+  <p>All tokens are traded exclusively against USDC as the sole quote currency. Every listing is a <code>TOKEN/USDC</code> pair.</p>
+  <p><strong>V1 listed tokens (14):</strong> <code>SOL</code>, <code>JUP</code>, <code>PUMP</code>, <code>ZEC</code>, <code>HYPE</code>, <code>SKR</code>, <code>cbBTC</code>, <code>ETH</code>, <code>BONK</code>, <code>PENGU</code>, <code>RAY</code>, <code>EURC</code>, <code>JTO</code>, <code>PYTH</code></p>
+  <p><strong>Pair listing policy:</strong> Flexible from day one. New tokens are listed when they receive significant user requests or rank among the top traded tokens on Jupiter. Listing new pairs quickly drives exchange volume and revenue. EURC/USDC serves users wanting to buy or sell euro-denominated stablecoins.</p>
+
+  <h3>5.3.2 Offer Creation</h3>
+  <p>Users specify: token to trade, amount, price per unit (always in USDC), and minimum fill amount (optional, defaults to full amount). Upon creation, the user's tokens are transferred to the escrow program PDA and locked immediately. Offers are visible on the marketplace instantly. Users can cancel anytime before a counterparty accepts.</p>
+
+  <h3>5.3.3 Offer Acceptance &amp; Settlement</h3>
+  <p>Counterparties (human or agent) browse the marketplace, select an offer, and initiate acceptance. The accepting party's wallet prompts for token approval and transfer to the escrow PDA. A 15-minute timeout begins. If the accepting party doesn't complete within the window, the trade auto-cancels and the locked tokens return. Upon successful payment, the escrow program atomically releases both sides. This flow is identical for A2A, H2A, A2H, and H2H trades.</p>
+
+  <h3>5.3.4 Escrow Timeout &amp; Anti-Griefing</h3>
+  <p>15-minute timeout protects sellers from liquidity lockup. No penalty for the first timeout, but repeated timeouts (3+ within 24 hours) trigger an automatic flag restricting the buyer for 1 hour.</p>
+
+  <h3>5.3.5 Price Reference</h3>
+  <p>Each offer displays the current Jupiter aggregator price for the same pair, so buyers immediately see if the P2P offer is better than the DEX. Display shows: <span class="wf-spread-good">"0.08% better than Jupiter"</span> or <span class="wf-spread-bad">"0.12% worse than Jupiter"</span>.</p>
+
+  <h2 id="agent-config">5.4 Agent Configuration (V1 &mdash; Simple)</h2>
+  <p>Agent setup is intentionally simple. After completing their first manual trade, users are prompted: <em>"You just saved $X vs Jupiter. Want an agent to do this 24/7?"</em></p>
+  <table>
+    <thead>
+      <tr><th>Parameter</th><th>Type</th><th>Description</th><th>Default</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Daily Spending Cap</td><td>USDC amount</td><td>Maximum per 24h rolling window</td><td>$500</td></tr>
+      <tr><td>Per-Trade Limit</td><td>USDC amount</td><td>Maximum single trade size</td><td>$100</td></tr>
+      <tr><td>Approved Token Pairs</td><td>Checkboxes</td><td>Which pairs agent can trade</td><td>All enabled</td></tr>
+      <tr><td>Auto-Accept Threshold</td><td>Percentage</td><td>Accept offers X% better than Jupiter</td><td>0.05%</td></tr>
+    </tbody>
+  </table>
+  <p>No developer knowledge required. Users can pause, reconfigure, or drain agent wallet anytime.</p>
+
+  <h2 id="marketplace">5.5 Marketplace Interface</h2>
+
+  <h3>5.5.1 Two-Sided Market</h3>
+  <p>The marketplace is split into two distinct markets, toggled by a prominent button:</p>
+  <ul>
+    <li><strong>Buyers Market:</strong> Users who want to <em>buy</em> tokens using USDC. Listings from sellers offering their tokens (SOL, ETH, BONK, etc.) in exchange for USDC.</li>
+    <li><strong>Sellers Market:</strong> Users who want to <em>sell</em> tokens to get USDC. Listings from buyers looking to buy tokens by offering USDC.</li>
+  </ul>
+  <p>Liquidity is always and only provided by users buying and selling. There are no automated market makers or liquidity pools &mdash; every offer is from a real counterparty (human or agent).</p>
+
+  <h3>5.5.2 User Trade Preferences</h3>
+  <p>Each user (human or agent) configures their trading preferences through their account:</p>
+  <ul>
+    <li><strong>Pair selection:</strong> Users choose which token pairs they want to trade. E.g., a user might only trade SOL/USDC and ETH/USDC. Their listings only appear in those markets.</li>
+    <li><strong>Amount limits:</strong> Users set minimum and maximum amounts per pair for each token they have available for trades. E.g., "100 SOL available" or "10,000 USDC available" or "2M BONK available."</li>
+    <li><strong>Side selection:</strong> A user can be a buyer only, a seller only, or both. E.g., a user with USDC might only want to buy SOL, PUMP, and BONK. A user with SOL and ETH might only want to sell those tokens for USDC.</li>
+  </ul>
+  <p>These preferences apply equally to humans and agents.</p>
+
+  <h3>5.5.3 Layout &amp; Features</h3>
+  <ul>
+    <li>Hybrid layout: order-book-style table on desktop, card-based feed on mobile</li>
+    <li>Prominent <strong>[Buy | Sell]</strong> toggle at the top of the marketplace to switch between buyers and sellers market</li>
+    <li>Both views display: token pair, price per unit (USDC), total amount, counterparty's reputation score and tier badge, type (human/agent), time since posted, and price delta vs Jupiter reference</li>
+    <li>Filtering: token pair selector, price range, minimum reputation, counterparty type (human/agent/all)</li>
+    <li>Sort by: best price, highest reputation, newest, largest amount</li>
+    <li>Default: best-priced offers first</li>
+  </ul>
+
+  <h2 id="live-feed">5.6 Live Trade Feed</h2>
+  <p>A real-time feed of completed trades visible to all users. Shows: token pair, amount, price, buyer/seller <code>.sol</code> domains (anonymized if privacy enabled), participant type badges (human/agent), and timestamp. Acts as social proof that the platform is active. Powered by Convex real-time subscriptions.</p>
+
+  <h2 id="tutorial">5.7 Tutorial Agent / Demo Mode</h2>
+  <p>New users can try the platform with a demo mode using fake USDC before committing real funds. A tutorial agent walks them through: browsing offers, accepting a trade, seeing settlement, and setting up their own agent. This is critical for non-technical user onboarding.</p>
+
+  <h2 id="privacy">5.8 Privacy (Application Layer)</h2>
+  <ul>
+    <li>Trade metadata (memo, context, notes between parties) encrypted end-to-end</li>
+    <li>Profile visibility controls: trade as agent profile only, hiding human identity</li>
+    <li>Anonymous offer listing: <code>.sol</code> domain hidden until trade is initiated</li>
+  </ul>
+
+  <h2 id="platform">5.9 Platform</h2>
+  <p><strong>V1 Launch Platform:</strong> Mobile-responsive web app (React/Next.js). NOT native iOS/Android apps for V1.</p>
+  <p><strong>Rationale:</strong> Web ships faster, doesn't require App Store approval (crypto apps face review friction), and allows rapid iteration. The web app must feel native on mobile browsers.</p>
+
+  <h2 id="revenue">5.10 Revenue Model</h2>
+
+  <h3>Revenue Streams</h3>
+  <table>
+    <thead>
+      <tr><th>Revenue Stream</th><th>Rate</th><th>Who Pays</th><th>Example ($10,000 Trade)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Exchange Fee (Buyer)</td><td>0.15%</td><td>Buyer</td><td>$15.00</td></tr>
+      <tr><td>Exchange Fee (Seller)</td><td>0.15%</td><td>Seller</td><td>$15.00</td></tr>
+      <tr><td>Agent Platform Fee</td><td>0.05%</td><td>Agent-facilitated trades</td><td>$5.00</td></tr>
+      <tr><td><strong>Total per Trade</strong></td><td><strong>0.30&ndash;0.35%</strong></td><td>Split between parties</td><td><strong>$30.00&ndash;$35.00</strong></td></tr>
+    </tbody>
+  </table>
+  <div class="callout callout-warning">
+    <p><strong>Open Question:</strong> Fee structure (0.3% vs 0.5%) is to be finalized. The above uses 2AM's model (0.15% each side + 0.05% agent fee). Original PRD used 0.5% (0.25% each side). Team to model and decide.</p>
+  </div>
+
+  <h3>Additional Revenue</h3>
+  <ul>
+    <li><code>.sol</code> domain registration service fee during onboarding</li>
+    <li>Platform fee on third-party agents (they use Coin's platform to earn, so Coin takes a cut)</li>
+    <li>Revenue collected into project treasury wallet on Solana</li>
+  </ul>
+
+  <h3>Revenue Projections (Conservative)</h3>
+  <table>
+    <thead>
+      <tr><th>Metric</th><th>Month 1</th><th>Month 3</th><th>Month 6</th><th>Month 12</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Daily GMV</td><td>$25K</td><td>$50K</td><td>$150K</td><td>$500K</td></tr>
+      <tr><td>Monthly Volume</td><td>$750K</td><td>$1.5M</td><td>$4.5M</td><td>$15M</td></tr>
+      <tr><td>Monthly Revenue (0.3%)</td><td>$2,250</td><td>$4,500</td><td>$13,500</td><td>$45,000</td></tr>
+      <tr><td>Agent Platform Fees</td><td>$375</td><td>$750</td><td>$2,250</td><td>$7,500</td></tr>
+      <tr><td><strong>Total Monthly Revenue</strong></td><td><strong>$2,625</strong></td><td><strong>$5,250</strong></td><td><strong>$15,750</strong></td><td><strong>$52,500</strong></td></tr>
+    </tbody>
+  </table>
+  <p>Success benchmark: 15% of Axiom's daily revenue.</p>
+
+  <h3>Payment to Contributors</h3>
+  <p>Post-launch, each partner has a share % dedicated as salary from revenue. Changes discussed per quarter. All partners also retain equity in the company (held in company treasury).</p>
+</div>
+
+<hr>
+
+<!-- SECTION 6: COIN-OPERATED MARKET MAKING AGENTS -->
+<div class="section page-break" id="cold-start">
+  <h1>6. Coin-Operated Market Making Agents (Cold Start)</h1>
+
+  <h2>6.1 Bootstrap Strategy</h2>
+  <p>Coin deploys 10&ndash;20 platform-operated market-making agents at launch to solve the cold-start problem. These agents create visible transaction volume, demonstrate the flywheel in action, and ensure every buyer finds liquidity from day one.</p>
+
+  <table>
+    <thead>
+      <tr><th>Parameter</th><th>Value</th><th>Rationale</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Pricing Strategy</td><td>Static offset (0.05&ndash;0.1% better than Jupiter)</td><td>Simple, predictable, easy to debug</td></tr>
+      <tr><td>Monthly Loss Budget</td><td>$5,000&ndash;$10,000 (capped)</td><td>Treated as marketing/liquidity cost</td></tr>
+      <tr><td>P&amp;L Target</td><td>Accept losses; break-even is a bonus</td><td>Volume bootstrapping &gt; profit</td></tr>
+      <tr><td>Token Pairs</td><td>All supported pairs</td><td>Full coverage from day 1</td></tr>
+      <tr><td>Rebalancing</td><td>Manual (team monitors daily)</td><td>Automated rebalancing in V2</td></tr>
+      <tr><td>Shutdown Criteria</td><td>When 3rd-party agents cover &gt;50% of volume</td><td>Platform agents are scaffolding</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6.2 The Flywheel</h2>
+  <div class="callout">
+    <p><strong>More agents listing offers</strong> &rarr; Better prices for humans &rarr; More human volume &rarr; More fee revenue for agents &rarr; More agents join &rarr; Deeper liquidity &rarr; Even better prices &rarr; <em>Repeat.</em></p>
+    <p>Driven by economic self-interest of agent market makers.</p>
+  </div>
+
+  <h2>6.3 Third-Party Agent Economics</h2>
+  <p>Third-party agents earn spread between buy and sell offers. Example: buy SOL at $134.80, sell at $134.93 &mdash; $0.13 spread per SOL is profit, minus the 0.15% per-side exchange fee. For profitability, agents need spreads wider than 0.30% while still beating Jupiter prices.</p>
+  <p>Additionally, the platform charges a flat 0.05% fee on agent-facilitated trades. This is clearly disclosed in agent documentation.</p>
+</div>
+
+<hr>
+
+<!-- SECTION 7: V1 OUT OF SCOPE -->
+<div class="section page-break" id="out-of-scope">
+  <h1>7. V1 Explicitly Out of Scope</h1>
+  <div class="out-of-scope">
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Native iOS / Android apps (V2 &mdash; web app first)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Additional social integrations beyond X and Farcaster (YouTube, GitHub, Instagram, TikTok &mdash; V2)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Automatic order book matching / limit orders (V2 &mdash; manual offer selection in V1)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Multi-chain support (Solana only in V1 &mdash; no Base, no Ethereum mainnet)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Token launch (no Coin token in V1, period)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Apple Pay / Google Pay fiat onramping (V2 &mdash; MoonPay or Transak)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Multi-agent support (one agent per user in V1)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Agent analytics dashboard (V2 &mdash; PnL, volume, counterparty map)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Zero-knowledge privacy (V3+)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Disputes / resolutions (no helpdesk for V1; atomic escrow eliminates most scenarios)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Tweet-based transactions via X</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> macOS / desktop app</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Third-party agent marketplace / ElizaOS plugins (V2)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Verified checkmark paid tier (V2 &mdash; V1 tiers are earned only)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Streaming micropayments</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> DEX aggregator integrations (Jupiter routing through Coin &mdash; V3)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Partial fills (V1: full fill only; partial fills add contract complexity &mdash; V2)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Dynamic agent pricing (V2 &mdash; static offset sufficient for launch)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Formal smart contract audit (V2 &mdash; V1 uses audited library patterns + peer review)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Yield / savings features (post-exchange roadmap)</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- SECTION 8: SYSTEM ARCHITECTURE -->
+<div class="section page-break" id="architecture">
+  <h1>8. System Architecture</h1>
+
+  <h2>8.1 High-Level Architecture</h2>
+  <div class="mermaid">
+graph TB
+    subgraph Client["Client Layer"]
+        WA["Web App<br/>React / Next.js<br/>Vercel"]
+    end
+
+    subgraph Auth["Auth Layer"]
+        PR["Privy<br/>X + Farcaster + Email<br/>JWT Sessions"]
+    end
+
+    subgraph API["API Layer"]
+        BE["Backend API<br/>Convex Server Functions<br/>+ Next.js / Vercel"]
+        AW["Agent Workers<br/>Node.js<br/>Railway"]
+    end
+
+    subgraph Blockchain["Solana"]
+        EP["Escrow Program<br/>Rust / Anchor<br/>PDAs"]
+        SPL["SPL Token<br/>Transfers"]
+        CNFT["Agent Identity<br/>Metaplex cNFT"]
+    end
+
+    subgraph External["External Services"]
+        WI["Embedded Wallets<br/>Privy + Agent Keypairs"]
+        SNS["SNS / Bonfida<br/>.sol Domains"]
+        JUP["Jupiter API<br/>Reference Pricing"]
+        HEL["Helius RPC<br/>Indexing + WebSockets"]
+        X402["x402 Protocol<br/>Agent Micropayments"]
+    end
+
+    subgraph Data["Data Layer"]
+        CV["Convex<br/>TypeScript Backend<br/>Real-time Subscriptions"]
+    end
+
+    WA --> PR
+    WA --> BE
+    PR --> BE
+    BE --> CV
+    BE --> EP
+    BE --> SNS
+    AW --> JUP
+    AW --> CV
+    AW --> EP
+    AW --> HEL
+    AW --> X402
+    EP --> SPL
+    EP --> CNFT
+    WI --> EP
+
+    style Client fill:#DBEAFE,stroke:#2563EB
+    style Auth fill:#EDE9FE,stroke:#7C3AED
+    style API fill:#D1FAE5,stroke:#059669
+    style Blockchain fill:#FEF3C7,stroke:#D97706
+    style External fill:#F3F4F6,stroke:#6B7280
+    style Data fill:#DBEAFE,stroke:#2563EB
+  </div>
+  <p class="diagram-caption">Figure 8.1 &mdash; High-Level System Architecture</p>
+
+  <h2>8.2 Data Model</h2>
+  <div class="mermaid">
+erDiagram
+    USER {
+        uuid id PK
+        string sol_domain
+        string wallet_address
+        string twitter_id
+        string farcaster_id
+        float reputation_score
+        string tier
+        timestamp created_at
+    }
+    AGENT {
+        uuid id PK
+        uuid owner_user_id FK
+        string identity_cnft_id
+        string wallet_address
+        json config
+        string status
+        float daily_spent
+    }
+    OFFER {
+        uuid id PK
+        uuid seller_id FK
+        string token_sell
+        string token_buy
+        float amount
+        float price
+        string escrow_tx_hash
+        string status
+        timestamp created_at
+        timestamp expires_at
+    }
+    TRADE {
+        uuid id PK
+        uuid offer_id FK
+        uuid buyer_id FK
+        uuid seller_id FK
+        float amount
+        float price
+        float fee_buyer
+        float fee_seller
+        string escrow_tx_hash
+        string settlement_tx_hash
+        timestamp settled_at
+    }
+    RATING {
+        uuid id PK
+        uuid trade_id FK
+        uuid rater_id FK
+        uuid rated_id FK
+        int score
+        string comment
+        timestamp created_at
+    }
+    TIMEOUT_LOG {
+        uuid id PK
+        uuid user_id FK
+        uuid offer_id FK
+        timestamp timestamp
+    }
+
+    USER ||--o{ AGENT : owns
+    USER ||--o{ OFFER : creates
+    USER ||--o{ TRADE : participates
+    OFFER ||--o| TRADE : settles
+    TRADE ||--o{ RATING : receives
+    USER ||--o{ TIMEOUT_LOG : accumulates
+  </div>
+  <p class="diagram-caption">Figure 8.2 &mdash; Data Model Entity-Relationship Diagram</p>
+
+  <h2>8.3 User Onboarding Flow</h2>
+  <div class="mermaid">
+flowchart TD
+    A["App Load"] --> B{"US IP?"}
+    B -->|Yes| C["Show Disclaimer<br/>Block Access"]
+    B -->|No| D["Privy Auth<br/>X / Farcaster / Email"]
+    D --> E{"Has .sol domain?"}
+    E -->|No| F["Select &amp; Register<br/>.sol Domain via Bonfida"]
+    E -->|Yes| G["Link Existing<br/>.sol Domain"]
+    F --> H["Create Embedded Wallet<br/>Human via Privy"]
+    G --> H
+    H --> I["Create Agent Wallet<br/>Programmatic Keypair"]
+    I --> J["Create Agent .sol Domain<br/>e.g. alice-agent.sol"]
+    J --> K["Mint Agent Identity cNFT<br/>Metaplex Bubblegum"]
+    K --> L{"Try Demo?"}
+    L -->|Yes| M["Tutorial / Demo Mode<br/>Trade with Fake USDC"]
+    L -->|No| N["Fund Wallet<br/>Deposit from External"]
+    M --> N
+    N --> O["Profile Complete<br/>Enter Marketplace"]
+
+    style A fill:#DBEAFE,stroke:#2563EB
+    style O fill:#D1FAE5,stroke:#059669
+    style C fill:#FEE2E2,stroke:#DC2626
+  </div>
+  <p class="diagram-caption">Figure 8.3 &mdash; User Onboarding Flow</p>
+
+  <h2>8.4 Trade Settlement Flow</h2>
+  <div class="mermaid">
+sequenceDiagram
+    participant S as Seller
+    participant BE as Coin Backend
+    participant EP as Escrow Program
+    participant B as Buyer
+    participant SOL as Solana
+
+    S->>BE: Create offer (token, qty, price)
+    BE->>EP: create_offer() - lock tokens in PDA
+    EP->>SOL: Transfer tokens to escrow PDA
+    SOL-->>EP: Confirmed
+    EP-->>BE: OfferCreated event
+    BE-->>S: Offer live on marketplace
+
+    Note over BE: Offer visible via Convex real-time subscriptions
+
+    B->>BE: Accept offer
+    BE->>EP: accept_offer() - buyer sends USDC
+    EP->>SOL: Transfer USDC to escrow PDA
+
+    Note over EP: 15-min timeout starts
+
+    EP->>EP: Verify both sides funded
+    EP->>SOL: Atomic swap - release both sides
+    SOL-->>S: Receive USDC (minus 0.15% fee)
+    SOL-->>B: Receive tokens (minus 0.15% fee)
+    SOL-->>EP: 0.3% fee to treasury
+
+    BE-->>S: Rate counterparty prompt
+    BE-->>B: Rate counterparty prompt
+    BE->>BE: Update reputation scores
+    BE->>BE: Add to live trade feed
+  </div>
+  <p class="diagram-caption">Figure 8.4 &mdash; Trade Settlement Sequence</p>
+
+  <h2>8.5 Agent Market Making Flow</h2>
+  <div class="mermaid">
+sequenceDiagram
+    participant JUP as Jupiter API
+    participant AG as Coin Agent
+    participant MKT as Marketplace
+    participant EP as Escrow Program
+    participant HU as Human Buyer
+
+    loop Every price update
+        JUP->>AG: SOL/USDC price = $135.00
+        AG->>AG: Calculate spread
+        AG->>MKT: Post sell offer @ $134.93<br/>(0.05% below Jupiter)
+        AG->>MKT: Post buy offer @ $134.80<br/>(0.15% below Jupiter)
+    end
+
+    HU->>MKT: Browse offers
+    HU->>EP: Accept sell offer @ $134.93
+    EP->>EP: Atomic escrow settlement
+    EP-->>HU: Receive SOL (saved vs Jupiter)
+    EP-->>AG: Receive USDC
+
+    AG->>AG: Check inventory
+    AG->>AG: Rebalance if needed
+
+    Note over AG: Earn $0.13 spread per SOL
+  </div>
+  <p class="diagram-caption">Figure 8.5 &mdash; Agent Market Making Sequence</p>
+
+  <h2>8.6 Agent Execution Model</h2>
+  <div class="mermaid">
+flowchart TD
+    A["Agent Start"] --> B["Subscribe to<br/>Jupiter WebSocket"]
+    A --> C["Subscribe to<br/>Convex Real-time"]
+
+    B --> D{"Price Update?"}
+    C --> E{"New Offer?"}
+
+    D -->|Yes| F{"Price Stale<br/>&gt;60s?"}
+    F -->|Yes| G["PAUSE Agent"]
+    F -->|No| H{"Daily Cap<br/>Exceeded?"}
+    H -->|Yes| I["PAUSE Until Reset"]
+    H -->|No| J["Evaluate vs Config"]
+    J --> K{"Spread &gt;<br/>Threshold?"}
+    K -->|Yes| L["Post/Update Offers<br/>via Escrow Program"]
+    K -->|No| M["Hold - No Action"]
+
+    E -->|Yes| N{"Within Config<br/>Limits?"}
+    N -->|Yes| O{"Price Better<br/>Than Threshold?"}
+    O -->|Yes| P["Accept Offer<br/>via Escrow"]
+    O -->|No| M
+    N -->|No| M
+
+    Q["Cron Fallback<br/>Every 60s"] --> D
+    Q --> E
+
+    R{"Wallet<br/>Compromised?"} -->|Yes| S["Auto-Revoke<br/>Notify Owner"]
+
+    style G fill:#FEE2E2,stroke:#DC2626
+    style I fill:#FEF3C7,stroke:#D97706
+    style S fill:#FEE2E2,stroke:#DC2626
+    style L fill:#D1FAE5,stroke:#059669
+    style P fill:#D1FAE5,stroke:#059669
+  </div>
+  <p class="diagram-caption">Figure 8.6 &mdash; Agent Execution Model</p>
+
+  <h2>8.7 Dual Profile &amp; Wallet Model</h2>
+  <div class="mermaid">
+flowchart LR
+    subgraph Account["User Account"]
+        direction TB
+        subgraph Human["Human Profile"]
+            HD[".sol domain: alice.sol"]
+            HW["Embedded Wallet<br/>via Privy"]
+            HV["X / Farcaster Verified"]
+            HS["Social Score"]
+        end
+        subgraph Agent["Agent Profile"]
+            AD[".sol domain: alice-agent.sol"]
+            AW["Programmatic Wallet<br/>Solana Keypair"]
+            AC["Identity cNFT"]
+            AR["On-chain Reputation"]
+        end
+    end
+
+    HW <-->|"User-controlled<br/>transfers"| AW
+
+    style Account fill:#F9FAFB,stroke:#E5E7EB
+    style Human fill:#DBEAFE,stroke:#2563EB
+    style Agent fill:#D1FAE5,stroke:#059669
+  </div>
+  <p class="diagram-caption">Figure 8.7 &mdash; Dual Profile &amp; Wallet Model</p>
+
+  <h2>8.8 x402 vs Escrow Decision Flow</h2>
+  <div class="mermaid">
+flowchart TD
+    A["Payment Needed"] --> B{"Transaction Type?"}
+    B -->|"Trade Settlement<br/>(any size)"| C["Escrow Program<br/>Two-phase commit"]
+    B -->|"Agent-to-Agent<br/>Service Fee"| D["x402 Protocol"]
+    B -->|"Agent Paying for<br/>Price Data"| E["x402 Protocol"]
+    B -->|"Small Agent-Agent<br/>Payment &lt;$100"| F["x402 Protocol<br/>(optional, revisit V2)"]
+    B -->|"User-Facing Trade<br/>(always)"| G["Escrow Program<br/>(always)"]
+
+    style C fill:#DBEAFE,stroke:#2563EB
+    style G fill:#DBEAFE,stroke:#2563EB
+    style D fill:#D1FAE5,stroke:#059669
+    style E fill:#D1FAE5,stroke:#059669
+    style F fill:#FEF3C7,stroke:#D97706
+  </div>
+  <p class="diagram-caption">Figure 8.8 &mdash; x402 vs Escrow Decision Flow</p>
+</div>
+
+<hr>
+
+<!-- SECTION 9: WIREFRAMES -->
+<div class="section page-break" id="wireframes">
+  <h1>9. Wireframes</h1>
+
+  <!-- 9.1 Onboarding -->
+  <h2>9.1 Onboarding Screen</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div style="text-align:center; padding-top:60px;">
+          <div style="font-size:48px; font-weight:700; color:#2563EB; letter-spacing:-2px;">COIN</div>
+          <p style="font-size:14px; color:#6B7280; margin-top:8px; padding:0 16px;">Trade tokens peer-to-peer with AI agents on Solana</p>
+        </div>
+        <div style="padding:40px 16px 0;">
+          <button class="wf-btn wf-btn-primary" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span style="font-size:18px;">&#120143;</span> Sign in with X
+          </button>
+          <button class="wf-btn wf-btn-secondary" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span style="font-size:16px;">&#9906;</span> Sign in with Farcaster
+          </button>
+          <button class="wf-btn wf-btn-outline">Continue with Email</button>
+          <div style="text-align:center; margin-top:24px;">
+            <a style="font-size:13px; color:#2563EB; font-weight:500;">Try Demo Mode &rarr;</a>
+          </div>
+        </div>
+        <div style="position:absolute; bottom:48px; left:16px; right:16px; text-align:center;">
+          <p style="font-size:10px; color:#9CA3AF;">Powered by Solana &bull; No KYC Required</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9.2 Domain Registration -->
+  <h2>9.2 Domain Registration Screen</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="wf-header">
+          <div class="wf-logo">COIN</div>
+        </div>
+        <div style="padding:0 8px;">
+          <div class="wf-section-title">Choose Your .sol Domain</div>
+          <p style="font-size:12px; color:#6B7280; margin-bottom:16px;">This is your identity on Coin. Pick a name that represents you.</p>
+          <div style="display:flex; gap:4px; margin-bottom:4px;">
+            <input class="wf-input" style="flex:1; margin-bottom:0;" placeholder="yourname" value="alice">
+            <div style="padding:12px 14px; background:#F3F4F6; border-radius:10px; font-size:14px; color:#6B7280; font-weight:600;">.sol</div>
+          </div>
+          <div style="font-size:12px; color:#059669; font-weight:500; margin-bottom:16px;">&#10003; alice.sol is available</div>
+          <div style="background:#F9FAFB; border-radius:10px; padding:12px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; font-size:13px;">
+              <span style="color:#6B7280;">Registration cost</span>
+              <span style="font-weight:600;">0.02 SOL (~$2.70)</span>
+            </div>
+          </div>
+          <button class="wf-btn wf-btn-primary">Register Domain</button>
+          <div style="text-align:center; margin-top:8px;">
+            <a style="font-size:13px; color:#2563EB;">I already have a .sol domain</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9.3 Agent Setup -->
+  <h2>9.3 Agent Setup Screen</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="wf-header">
+          <div class="wf-logo">COIN</div>
+        </div>
+        <div style="padding:0 8px;">
+          <div style="background:#D1FAE5; border-radius:12px; padding:16px; margin-bottom:16px; text-align:center;">
+            <div style="font-size:24px; font-weight:700; color:#059669;">You saved $4.23</div>
+            <div style="font-size:12px; color:#065F46;">vs Jupiter on your last trade</div>
+          </div>
+          <div class="wf-section-title">Want an agent to do this 24/7?</div>
+          <p style="font-size:12px; color:#6B7280; margin-bottom:16px;">Your agent trades automatically, earning spread while you sleep.</p>
+          <label class="wf-label">Agent Domain</label>
+          <input class="wf-input" value="alice-agent.sol">
+          <label class="wf-label">Daily Spending Cap (USDC)</label>
+          <input class="wf-input" value="$500">
+          <label class="wf-label">Approved Pairs</label>
+          <div style="margin-bottom:16px;">
+            <div class="wf-check-row"><div class="wf-checkbox checked"></div> SOL / USDC</div>
+            <div class="wf-check-row"><div class="wf-checkbox checked"></div> JUP / USDC</div>
+            <div class="wf-check-row"><div class="wf-checkbox"></div> BONK / USDC</div>
+            <div class="wf-check-row"><div class="wf-checkbox checked"></div> EURC / USDC</div>
+          </div>
+          <button class="wf-btn wf-btn-primary">Create Your Agent</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9.4 Exchange Main Screen -->
+  <h2>9.4 Exchange Main Screen (Offer Feed)</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="wf-header">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="wf-logo" style="font-size:22px;">COIN</div>
+            <button class="wf-small-btn" style="background:#2563EB; color:white;">+ Post Offer</button>
+          </div>
+        </div>
+        <div style="padding:0 4px;">
+          <!-- Buy/Sell Market Toggle -->
+          <div class="wf-toggle-row" style="margin-bottom:8px;">
+            <div class="wf-toggle active" style="background:#059669;">Buy</div>
+            <div class="wf-toggle inactive">Sell</div>
+          </div>
+          <div class="wf-tab-row">
+            <div class="wf-tab active">SOL/USDC</div>
+            <div class="wf-tab">ETH/USDC</div>
+            <div class="wf-tab">PUMP/USDC</div>
+            <div class="wf-tab">All</div>
+          </div>
+          <div style="text-align:center; font-size:11px; font-weight:600; color:#059669; margin-bottom:8px;">BUYERS MARKET &mdash; Sellers offering SOL for your USDC</div>
+          <div class="wf-price-ref">Jupiter: 1 SOL = $135.00 USDC</div>
+          <!-- Offer Card 1 -->
+          <div class="wf-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div>
+                <span style="font-weight:600; font-size:13px;">sol-maker.sol</span>
+                <span class="wf-badge wf-badge-agent">Agent</span>
+              </div>
+              <span class="wf-spread-good">-0.08% vs Jup</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+              <span>Selling <strong>50 SOL</strong></span>
+              <span style="font-weight:600;">$134.89/SOL</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:#6B7280;">&#9733; 4.8 &bull; Trusted &bull; 2m ago</span>
+              <button class="wf-small-btn" style="background:#2563EB; color:white;">Trade</button>
+            </div>
+          </div>
+          <!-- Offer Card 2 -->
+          <div class="wf-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div>
+                <span style="font-weight:600; font-size:13px;">cryptobob.sol</span>
+                <span class="wf-badge wf-badge-human">Human</span>
+              </div>
+              <span class="wf-spread-good">-0.05% vs Jup</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+              <span>Selling <strong>120 SOL</strong></span>
+              <span style="font-weight:600;">$134.93/SOL</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:#6B7280;">&#9733; 4.2 &bull; Verified &bull; 8m ago</span>
+              <button class="wf-small-btn" style="background:#2563EB; color:white;">Trade</button>
+            </div>
+          </div>
+          <!-- Offer Card 3 -->
+          <div class="wf-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div>
+                <span style="font-weight:600; font-size:13px;">alpha-bot.sol</span>
+                <span class="wf-badge wf-badge-agent">Agent</span>
+              </div>
+              <span class="wf-spread-bad">+0.12% vs Jup</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+              <span>Selling <strong>25 SOL</strong></span>
+              <span style="font-weight:600;">$135.16/SOL</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:#6B7280;">&#9733; 3.9 &bull; Verified &bull; 15m ago</span>
+              <button class="wf-small-btn" style="background:#2563EB; color:white;">Trade</button>
+            </div>
+          </div>
+        </div>
+        <div class="wf-nav">
+          <div class="wf-nav-item active"><span class="wf-nav-icon">&#9776;</span>Exchange</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9998;</span>My Offers</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#128179;</span>Wallet</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9786;</span>Profile</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9.5 Offer Detail / Trade Initiation -->
+  <h2>9.5 Offer Detail / Trade Initiation</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div style="padding:16px 8px 0;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+            <span style="font-size:18px; cursor:pointer;">&larr;</span>
+            <span style="font-size:16px; font-weight:600;">Trade Details</span>
+          </div>
+          <!-- Seller Info -->
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+            <div style="width:44px; height:44px; background:#DBEAFE; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px;">&#129302;</div>
+            <div>
+              <div style="font-weight:600; font-size:14px;">sol-maker.sol <span class="wf-badge wf-badge-agent">Agent</span></div>
+              <div style="font-size:11px; color:#6B7280;"><span class="wf-badge wf-badge-tier">Trusted</span> &bull; &#9733; 4.8 &bull; 247 trades</div>
+            </div>
+          </div>
+          <!-- Offer Details -->
+          <div style="background:#F9FAFB; border-radius:12px; padding:14px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;">
+              <span style="color:#6B7280;">Selling</span>
+              <span style="font-weight:600;">50 SOL</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;">
+              <span style="color:#6B7280;">Price</span>
+              <span style="font-weight:600;">$134.89 / SOL</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;">
+              <span style="color:#6B7280;">Total</span>
+              <span style="font-weight:700; font-size:15px;">$6,744.50 USDC</span>
+            </div>
+            <hr class="wf-divider">
+            <div style="display:flex; justify-content:space-between; font-size:13px;">
+              <span style="color:#6B7280;">vs Jupiter</span>
+              <span class="wf-spread-good">0.08% better &mdash; Save $5.40</span>
+            </div>
+          </div>
+          <!-- Fee -->
+          <div style="background:#FEF3C7; border-radius:8px; padding:10px; margin-bottom:16px; font-size:12px;">
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#92400E;">Exchange fee (0.15%)</span>
+              <span style="font-weight:600; color:#92400E;">$10.12 USDC</span>
+            </div>
+          </div>
+          <button class="wf-btn wf-btn-primary" style="font-size:16px; padding:16px;">Confirm Trade</button>
+          <p style="text-align:center; font-size:11px; color:#9CA3AF; margin-top:8px;">Settlement via Solana escrow &bull; &lt;2 seconds</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9.6 Post Offer -->
+  <h2>9.6 Post Offer Screen</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div style="padding:16px 8px 0;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+            <span style="font-size:18px; cursor:pointer;">&larr;</span>
+            <span style="font-size:16px; font-weight:600;">Create Offer</span>
+          </div>
+          <div class="wf-toggle-row">
+            <div class="wf-toggle active">Selling</div>
+            <div class="wf-toggle inactive">Buying</div>
+          </div>
+          <label class="wf-label">Token</label>
+          <div class="wf-input" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>SOL</span><span style="color:#6B7280;">&#9660;</span>
+          </div>
+          <label class="wf-label">Quantity</label>
+          <input class="wf-input" value="50">
+          <label class="wf-label">Price per SOL (USDC)</label>
+          <div style="display:flex; gap:8px; align-items:center; margin-bottom:4px;">
+            <input class="wf-input" style="flex:1; margin-bottom:0;" value="134.89">
+          </div>
+          <div style="font-size:11px; color:#6B7280; margin-bottom:12px;">Jupiter: $135.00 &bull; <span class="wf-spread-good">Your spread: -0.08%</span></div>
+          <label class="wf-label">Expires In</label>
+          <div class="wf-input" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>1 hour</span><span style="color:#6B7280;">&#9660;</span>
+          </div>
+          <div style="background:#F9FAFB; border-radius:10px; padding:12px; margin-bottom:16px; margin-top:8px;">
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
+              <span style="color:#6B7280;">Total value</span>
+              <span style="font-weight:600;">$6,744.50 USDC</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:13px;">
+              <span style="color:#6B7280;">Your fee (0.15%)</span>
+              <span style="font-weight:500;">$10.12 USDC</span>
+            </div>
+          </div>
+          <button class="wf-btn wf-btn-primary">Post Offer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9.7 Profile -->
+  <h2>9.7 Profile Screen</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div style="padding:16px 8px 0;">
+          <div style="text-align:center; margin-bottom:16px;">
+            <div style="width:56px; height:56px; background:#DBEAFE; border-radius:50%; margin:0 auto 8px; display:flex; align-items:center; justify-content:center; font-size:24px;">&#128100;</div>
+            <div style="font-size:16px; font-weight:700;">alice.sol</div>
+            <div style="font-size:12px; color:#6B7280;">@alice_trader &bull; <span class="wf-badge wf-badge-tier">Trusted</span></div>
+          </div>
+          <div style="display:flex; justify-content:space-around; margin-bottom:16px;">
+            <div class="wf-stat"><div class="wf-stat-value">4.8</div><div class="wf-stat-label">Rating</div></div>
+            <div class="wf-stat"><div class="wf-stat-value">247</div><div class="wf-stat-label">Trades</div></div>
+            <div class="wf-stat"><div class="wf-stat-value">$52K</div><div class="wf-stat-label">Volume</div></div>
+          </div>
+          <hr class="wf-divider">
+          <!-- Agent Section -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-size:14px; font-weight:600;">Your Agent</div>
+            <span class="wf-badge" style="background:#D1FAE5; color:#059669;">Active</span>
+          </div>
+          <div class="wf-card">
+            <div style="font-weight:600; font-size:13px; margin-bottom:4px;">alice-agent.sol <span class="wf-badge wf-badge-agent">Agent</span></div>
+            <div style="font-size:12px; color:#6B7280; margin-bottom:4px;">&#9733; 4.9 &bull; 1,203 trades &bull; $128K vol</div>
+            <div style="display:flex; justify-content:space-between; font-size:12px;">
+              <span style="color:#6B7280;">Today's P&amp;L</span>
+              <span style="color:#059669; font-weight:600;">+$12.47</span>
+            </div>
+          </div>
+          <!-- Wallets Summary -->
+          <div style="font-size:14px; font-weight:600; margin-top:12px; margin-bottom:8px;">Wallets</div>
+          <div style="display:flex; gap:8px;">
+            <div style="flex:1; background:#DBEAFE; border-radius:10px; padding:10px; text-align:center;">
+              <div style="font-size:11px; color:#1E40AF;">Human</div>
+              <div style="font-size:16px; font-weight:700; color:#1E40AF;">$1,240</div>
+            </div>
+            <div style="flex:1; background:#D1FAE5; border-radius:10px; padding:10px; text-align:center;">
+              <div style="font-size:11px; color:#065F46;">Agent</div>
+              <div style="font-size:16px; font-weight:700; color:#065F46;">$890</div>
+            </div>
+          </div>
+        </div>
+        <div class="wf-nav">
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9776;</span>Exchange</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9998;</span>My Offers</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#128179;</span>Wallet</div>
+          <div class="wf-nav-item active"><span class="wf-nav-icon">&#9786;</span>Profile</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9.8 Wallet -->
+  <h2>9.8 Wallet Screen</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div style="padding:16px 8px 0;">
+          <div class="wf-section-title">Wallet</div>
+          <div class="wf-wallet-section">
+            <div class="wf-wallet-title">Your Wallet (alice.sol)</div>
+            <div class="wf-token-row"><span class="wf-token-name">USDC</span><span class="wf-token-bal">$1,240.00</span></div>
+            <div class="wf-token-row"><span class="wf-token-name">SOL</span><span class="wf-token-bal">8.5 ($1,147.50)</span></div>
+            <div class="wf-token-row"><span class="wf-token-name">EURC</span><span class="wf-token-bal">500.00</span></div>
+            <div class="wf-token-row"><span class="wf-token-name">JUP</span><span class="wf-token-bal">120.0 ($96.00)</span></div>
+          </div>
+          <div class="wf-wallet-section">
+            <div class="wf-wallet-title">Agent Wallet (alice-agent.sol)</div>
+            <div class="wf-token-row"><span class="wf-token-name">USDC</span><span class="wf-token-bal">$690.00</span></div>
+            <div class="wf-token-row"><span class="wf-token-name">SOL</span><span class="wf-token-bal">1.5 ($202.50)</span></div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="wf-btn wf-btn-primary" style="flex:1; margin-bottom:0;">Fund Agent</button>
+            <button class="wf-btn wf-btn-outline" style="flex:1; margin-bottom:0;">Withdraw</button>
+          </div>
+          <div style="margin-top:16px;">
+            <div style="font-size:14px; font-weight:600; margin-bottom:8px;">Recent Transactions</div>
+            <div style="font-size:12px; border-bottom:1px solid #E5E7EB; padding:8px 0;">
+              <div style="display:flex; justify-content:space-between;">
+                <span>Sold 10 SOL &rarr; USDC</span>
+                <span style="color:#059669; font-weight:500;">+$1,348.90</span>
+              </div>
+              <div style="color:#9CA3AF; font-size:11px;">2 min ago &bull; via Agent</div>
+            </div>
+            <div style="font-size:12px; border-bottom:1px solid #E5E7EB; padding:8px 0;">
+              <div style="display:flex; justify-content:space-between;">
+                <span>Bought 50 JUP &rarr; USDC</span>
+                <span style="color:#DC2626; font-weight:500;">-$40.00</span>
+              </div>
+              <div style="color:#9CA3AF; font-size:11px;">1 hour ago &bull; Manual</div>
+            </div>
+          </div>
+        </div>
+        <div class="wf-nav">
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9776;</span>Exchange</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9998;</span>My Offers</div>
+          <div class="wf-nav-item active"><span class="wf-nav-icon">&#128179;</span>Wallet</div>
+          <div class="wf-nav-item"><span class="wf-nav-icon">&#9786;</span>Profile</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9.9 Demo / Tutorial -->
+  <h2>9.9 Demo / Tutorial Screen</h2>
+  <div class="wireframe-row">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div style="background:#FEF3C7; padding:10px; text-align:center; font-size:12px; font-weight:600; color:#92400E;">
+          DEMO MODE &mdash; No Real Funds
+        </div>
+        <div style="padding:16px 8px 0;">
+          <div class="wf-section-title">Welcome to Coin!</div>
+          <p style="font-size:12px; color:#6B7280; margin-bottom:16px;">Let's walk through your first trade with demo USDC.</p>
+          <!-- Progress -->
+          <div style="display:flex; gap:4px; margin-bottom:16px;">
+            <div style="flex:1; height:4px; background:#2563EB; border-radius:2px;"></div>
+            <div style="flex:1; height:4px; background:#2563EB; border-radius:2px;"></div>
+            <div style="flex:1; height:4px; background:#E5E7EB; border-radius:2px;"></div>
+            <div style="flex:1; height:4px; background:#E5E7EB; border-radius:2px;"></div>
+          </div>
+          <div style="background:#DBEAFE; border-radius:12px; padding:14px; margin-bottom:16px;">
+            <div style="font-size:13px; font-weight:600; color:#1E40AF; margin-bottom:4px;">Step 2: Accept an Offer</div>
+            <div style="font-size:12px; color:#1E40AF;">Tap "Trade" on any offer below to simulate accepting a P2P trade.</div>
+          </div>
+          <!-- Demo Offer -->
+          <div class="wf-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div>
+                <span style="font-weight:600; font-size:13px;">demo-agent.sol</span>
+                <span class="wf-badge wf-badge-agent">Agent</span>
+              </div>
+              <span class="wf-spread-good">-0.10% vs Jup</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+              <span>Selling <strong>5 SOL</strong></span>
+              <span style="font-weight:600;">$134.87/SOL</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:#6B7280;">Demo offer</span>
+              <button class="wf-small-btn" style="background:#2563EB; color:white;">Try Trade</button>
+            </div>
+          </div>
+          <div style="text-align:center; margin-top:24px;">
+            <a style="font-size:13px; color:#2563EB; font-weight:500;">Ready to trade for real? Fund your wallet &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DESKTOP WIREFRAMES -->
+<div class="section page-break" style="padding-top:24px;">
+  <h2>9.10 Desktop: Exchange (Order Book View)</h2>
+  <div class="wireframe-row">
+    <div class="desktop-frame">
+      <div class="desktop-frame-bar">
+        <span class="desktop-frame-dot red"></span>
+        <span class="desktop-frame-dot yellow"></span>
+        <span class="desktop-frame-dot green"></span>
+        <div class="desktop-frame-url">coin.family/exchange</div>
+      </div>
+      <div class="desktop-screen">
+        <!-- Top Nav -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:16px; border-bottom:1px solid #E5E7EB; margin-bottom:20px;">
+          <div style="display:flex; align-items:center; gap:24px;">
+            <span style="font-size:24px; font-weight:700; color:#2563EB;">COIN</span>
+            <span style="font-size:13px; font-weight:600; color:#111827;">Exchange</span>
+            <span style="font-size:13px; color:#6B7280;">My Offers</span>
+            <span style="font-size:13px; color:#6B7280;">Wallet</span>
+            <span style="font-size:13px; color:#6B7280;">Profile</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:12px; color:#6B7280;">alice.sol</span>
+            <div style="width:32px; height:32px; background:#DBEAFE; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">&#128100;</div>
+          </div>
+        </div>
+        <!-- Buy/Sell Toggle + Controls Row -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <div style="display:flex; gap:0; border-radius:8px; overflow:hidden; border:2px solid #059669;">
+              <div style="padding:6px 16px; background:#059669; color:white; font-size:12px; font-weight:600;">Buy</div>
+              <div style="padding:6px 16px; background:white; color:#6B7280; font-size:12px; font-weight:600;">Sell</div>
+            </div>
+            <div style="width:1px; height:24px; background:#E5E7EB; margin:0 4px;"></div>
+            <div style="padding:6px 14px; background:#2563EB; color:white; border-radius:8px; font-size:12px; font-weight:600;">SOL/USDC</div>
+            <div style="padding:6px 14px; background:#F3F4F6; border-radius:8px; font-size:12px; color:#6B7280;">ETH/USDC</div>
+            <div style="padding:6px 14px; background:#F3F4F6; border-radius:8px; font-size:12px; color:#6B7280;">PUMP/USDC</div>
+            <div style="padding:6px 14px; background:#F3F4F6; border-radius:8px; font-size:12px; color:#6B7280;">BONK/USDC</div>
+            <div style="padding:6px 14px; background:#F3F4F6; border-radius:8px; font-size:12px; color:#6B7280;">All</div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <div style="background:#F9FAFB; border-radius:8px; padding:6px 12px; font-size:11px; color:#6B7280;">Jupiter: <strong style="color:#111827;">$135.00</strong></div>
+            <button style="padding:8px 16px; background:#2563EB; color:white; border:none; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer;">+ Post Offer</button>
+          </div>
+        </div>
+        <!-- Order Book Table -->
+        <table class="wf-desk-table">
+          <thead>
+            <tr>
+              <th>Seller</th>
+              <th>Type</th>
+              <th>Selling</th>
+              <th>Price</th>
+              <th>vs Jupiter</th>
+              <th>Rating</th>
+              <th>Tier</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">sol-maker.sol</td>
+              <td><span class="wf-badge wf-badge-agent">Agent</span></td>
+              <td>50 SOL</td>
+              <td style="font-weight:600;">$134.89</td>
+              <td><span class="wf-spread-good">-0.08%</span></td>
+              <td>&#9733; 4.8</td>
+              <td><span class="wf-badge wf-badge-tier">Trusted</span></td>
+              <td><button class="wf-small-btn" style="background:#2563EB; color:white;">Trade</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">cryptobob.sol</td>
+              <td><span class="wf-badge wf-badge-human">Human</span></td>
+              <td>120 SOL</td>
+              <td style="font-weight:600;">$134.93</td>
+              <td><span class="wf-spread-good">-0.05%</span></td>
+              <td>&#9733; 4.2</td>
+              <td><span class="wf-badge wf-badge-tier">Verified</span></td>
+              <td><button class="wf-small-btn" style="background:#2563EB; color:white;">Trade</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">alpha-bot.sol</td>
+              <td><span class="wf-badge wf-badge-agent">Agent</span></td>
+              <td>25 SOL</td>
+              <td style="font-weight:600;">$135.16</td>
+              <td><span class="wf-spread-bad">+0.12%</span></td>
+              <td>&#9733; 3.9</td>
+              <td><span class="wf-badge wf-badge-tier">Verified</span></td>
+              <td><button class="wf-small-btn" style="background:#2563EB; color:white;">Trade</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">deep-trader.sol</td>
+              <td><span class="wf-badge wf-badge-agent">Agent</span></td>
+              <td>200 SOL</td>
+              <td style="font-weight:600;">$134.85</td>
+              <td><span class="wf-spread-good">-0.11%</span></td>
+              <td>&#9733; 4.9</td>
+              <td><span class="wf-badge wf-badge-tier">Established</span></td>
+              <td><button class="wf-small-btn" style="background:#2563EB; color:white;">Trade</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">whale-mm.sol</td>
+              <td><span class="wf-badge wf-badge-agent">Agent</span></td>
+              <td>500 SOL</td>
+              <td style="font-weight:600;">$134.91</td>
+              <td><span class="wf-spread-good">-0.07%</span></td>
+              <td>&#9733; 4.7</td>
+              <td><span class="wf-badge wf-badge-tier">Trusted</span></td>
+              <td><button class="wf-small-btn" style="background:#2563EB; color:white;">Trade</button></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">jess-trades.sol</td>
+              <td><span class="wf-badge wf-badge-human">Human</span></td>
+              <td>75 SOL</td>
+              <td style="font-weight:600;">$134.88</td>
+              <td><span class="wf-spread-good">-0.09%</span></td>
+              <td>&#9733; 4.5</td>
+              <td><span class="wf-badge wf-badge-tier">Verified</span></td>
+              <td><button class="wf-small-btn" style="background:#2563EB; color:white;">Trade</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- Live Feed Bar -->
+        <div style="margin-top:16px; padding:10px 16px; background:#F9FAFB; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-size:11px; color:#6B7280;">
+            <strong style="color:#111827;">Live Feed:</strong>
+            sol-maker.sol sold 10 SOL to cryptobob.sol at $134.89 &bull; <span class="wf-spread-good">-0.08% vs Jupiter</span> &bull; 12s ago
+          </div>
+          <a style="font-size:11px; color:#2563EB; font-weight:500;">View All &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>9.11 Desktop: Trade Detail</h2>
+  <div class="wireframe-row">
+    <div class="desktop-frame">
+      <div class="desktop-frame-bar">
+        <span class="desktop-frame-dot red"></span>
+        <span class="desktop-frame-dot yellow"></span>
+        <span class="desktop-frame-dot green"></span>
+        <div class="desktop-frame-url">coin.family/trade/sol-maker-50sol</div>
+      </div>
+      <div class="desktop-screen">
+        <!-- Top Nav (compact) -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:16px; border-bottom:1px solid #E5E7EB; margin-bottom:24px;">
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span style="font-size:24px; font-weight:700; color:#2563EB;">COIN</span>
+            <span style="font-size:14px; color:#6B7280;">&larr; Back to Exchange</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:12px; color:#6B7280;">alice.sol</span>
+            <div style="width:32px; height:32px; background:#DBEAFE; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">&#128100;</div>
+          </div>
+        </div>
+        <!-- Two-column layout -->
+        <div style="display:flex; gap:32px;">
+          <!-- Left: Seller Info + Trade Details -->
+          <div style="flex:1;">
+            <div style="font-size:18px; font-weight:700; margin-bottom:16px;">Trade Details</div>
+            <!-- Seller card -->
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px; padding:16px; background:#F9FAFB; border-radius:12px;">
+              <div style="width:48px; height:48px; background:#DBEAFE; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px;">&#129302;</div>
+              <div>
+                <div style="font-weight:600; font-size:15px;">sol-maker.sol <span class="wf-badge wf-badge-agent">Agent</span></div>
+                <div style="font-size:12px; color:#6B7280;"><span class="wf-badge wf-badge-tier">Trusted</span> &bull; &#9733; 4.8 &bull; 247 trades &bull; $52K volume</div>
+              </div>
+            </div>
+            <!-- Offer breakdown -->
+            <div style="background:#FFFFFF; border:1px solid #E5E7EB; border-radius:12px; padding:20px;">
+              <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:12px;">
+                <span style="color:#6B7280;">Selling</span>
+                <span style="font-weight:600;">50 SOL</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:12px;">
+                <span style="color:#6B7280;">Price per SOL</span>
+                <span style="font-weight:600;">$134.89 USDC</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:12px;">
+                <span style="color:#6B7280;">Total</span>
+                <span style="font-weight:700; font-size:16px;">$6,744.50 USDC</span>
+              </div>
+              <hr style="border:none; border-top:1px solid #E5E7EB; margin:12px 0;">
+              <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:12px;">
+                <span style="color:#6B7280;">vs Jupiter ($135.00)</span>
+                <span class="wf-spread-good" style="font-size:14px;">0.08% better &mdash; Save $5.40</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:14px;">
+                <span style="color:#6B7280;">Exchange fee (0.15%)</span>
+                <span style="font-weight:500; color:#92400E;">$10.12 USDC</span>
+              </div>
+            </div>
+          </div>
+          <!-- Right: Confirm panel -->
+          <div style="width:280px;">
+            <div style="background:#F9FAFB; border-radius:12px; padding:24px; border:1px solid #E5E7EB;">
+              <div style="font-size:16px; font-weight:700; margin-bottom:16px; text-align:center;">Confirm Trade</div>
+              <div style="text-align:center; margin-bottom:16px;">
+                <div style="font-size:28px; font-weight:700; color:#2563EB;">50 SOL</div>
+                <div style="font-size:13px; color:#6B7280;">for $6,744.50 USDC</div>
+              </div>
+              <div style="background:#D1FAE5; border-radius:8px; padding:10px; text-align:center; margin-bottom:16px;">
+                <div style="font-size:12px; color:#065F46; font-weight:600;">You save $5.40 vs Jupiter</div>
+              </div>
+              <button class="wf-btn wf-btn-primary" style="font-size:15px; padding:14px; margin-bottom:8px;">Confirm &amp; Execute Trade</button>
+              <p style="text-align:center; font-size:11px; color:#9CA3AF;">Settlement via Solana escrow &bull; &lt;2 seconds</p>
+              <p style="text-align:center; font-size:11px; color:#9CA3AF; margin-top:4px;">Escrowed tokens released atomically on settlement</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>9.12 Desktop: Profile &amp; Agent Dashboard</h2>
+  <div class="wireframe-row">
+    <div class="desktop-frame">
+      <div class="desktop-frame-bar">
+        <span class="desktop-frame-dot red"></span>
+        <span class="desktop-frame-dot yellow"></span>
+        <span class="desktop-frame-dot green"></span>
+        <div class="desktop-frame-url">coin.family/profile/alice.sol</div>
+      </div>
+      <div class="desktop-screen">
+        <!-- Top Nav -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:16px; border-bottom:1px solid #E5E7EB; margin-bottom:24px;">
+          <div style="display:flex; align-items:center; gap:24px;">
+            <span style="font-size:24px; font-weight:700; color:#2563EB;">COIN</span>
+            <span style="font-size:13px; color:#6B7280;">Exchange</span>
+            <span style="font-size:13px; color:#6B7280;">My Offers</span>
+            <span style="font-size:13px; color:#6B7280;">Wallet</span>
+            <span style="font-size:13px; font-weight:600; color:#111827;">Profile</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:12px; color:#6B7280;">alice.sol</span>
+            <div style="width:32px; height:32px; background:#DBEAFE; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px;">&#128100;</div>
+          </div>
+        </div>
+        <!-- Two-column layout: Human + Agent side by side -->
+        <div style="display:flex; gap:24px;">
+          <!-- Left: Human Profile -->
+          <div style="flex:1; background:#F9FAFB; border-radius:12px; padding:20px; border:1px solid #E5E7EB;">
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+              <div style="width:52px; height:52px; background:#DBEAFE; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px;">&#128100;</div>
+              <div>
+                <div style="font-size:17px; font-weight:700;">alice.sol</div>
+                <div style="font-size:12px; color:#6B7280;">@alice_trader &bull; <span class="wf-badge wf-badge-tier">Trusted</span></div>
+              </div>
+            </div>
+            <div style="display:flex; gap:16px; margin-bottom:16px;">
+              <div class="wf-stat"><div class="wf-stat-value">4.8</div><div class="wf-stat-label">Rating</div></div>
+              <div class="wf-stat"><div class="wf-stat-value">247</div><div class="wf-stat-label">Trades</div></div>
+              <div class="wf-stat"><div class="wf-stat-value">$52K</div><div class="wf-stat-label">Volume</div></div>
+            </div>
+            <div style="font-size:13px; font-weight:600; margin-bottom:8px;">Human Wallet</div>
+            <div style="background:white; border-radius:8px; padding:12px;">
+              <div class="wf-token-row"><span class="wf-token-name">USDC</span><span class="wf-token-bal">$1,240.00</span></div>
+              <div class="wf-token-row"><span class="wf-token-name">SOL</span><span class="wf-token-bal">8.5 ($1,147.50)</span></div>
+              <div class="wf-token-row"><span class="wf-token-name">EURC</span><span class="wf-token-bal">500.00</span></div>
+              <div class="wf-token-row"><span class="wf-token-name">JUP</span><span class="wf-token-bal">120.0 ($96.00)</span></div>
+            </div>
+          </div>
+          <!-- Right: Agent Profile -->
+          <div style="flex:1; background:#F0FDF4; border-radius:12px; padding:20px; border:1px solid #BBF7D0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <div style="width:52px; height:52px; background:#D1FAE5; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px;">&#129302;</div>
+                <div>
+                  <div style="font-size:17px; font-weight:700;">alice-agent.sol <span class="wf-badge wf-badge-agent">Agent</span></div>
+                  <div style="font-size:12px; color:#6B7280;">&#9733; 4.9 &bull; 1,203 trades &bull; $128K vol</div>
+                </div>
+              </div>
+              <span class="wf-badge" style="background:#D1FAE5; color:#059669; font-size:12px; padding:4px 12px;">Active</span>
+            </div>
+            <!-- Agent Stats -->
+            <div style="display:flex; gap:16px; margin-bottom:16px;">
+              <div class="wf-stat"><div class="wf-stat-value" style="color:#059669;">+$12.47</div><div class="wf-stat-label">Today's P&amp;L</div></div>
+              <div class="wf-stat"><div class="wf-stat-value" style="color:#059669;">+$287</div><div class="wf-stat-label">This Week</div></div>
+              <div class="wf-stat"><div class="wf-stat-value">18</div><div class="wf-stat-label">Today's Trades</div></div>
+            </div>
+            <!-- Agent Config Summary -->
+            <div style="font-size:13px; font-weight:600; margin-bottom:8px;">Agent Configuration</div>
+            <div style="background:white; border-radius:8px; padding:12px; margin-bottom:12px;">
+              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
+                <span style="color:#6B7280;">Daily Cap</span><span style="font-weight:500;">$500 USDC</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
+                <span style="color:#6B7280;">Per-Trade Limit</span><span style="font-weight:500;">$100 USDC</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
+                <span style="color:#6B7280;">Auto-Accept</span><span style="font-weight:500;">-0.05% vs Jupiter</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:12px;">
+                <span style="color:#6B7280;">Pairs</span><span style="font-weight:500;">SOL, JUP, BONK</span>
+              </div>
+            </div>
+            <div style="font-size:13px; font-weight:600; margin-bottom:8px;">Agent Wallet</div>
+            <div style="background:white; border-radius:8px; padding:12px;">
+              <div class="wf-token-row"><span class="wf-token-name">USDC</span><span class="wf-token-bal">$690.00</span></div>
+              <div class="wf-token-row"><span class="wf-token-name">SOL</span><span class="wf-token-bal">1.5 ($202.50)</span></div>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:12px;">
+              <button class="wf-small-btn" style="flex:1; background:#2563EB; color:white; padding:8px;">Fund Agent</button>
+              <button class="wf-small-btn" style="flex:1; background:#F3F4F6; color:#374151; padding:8px;">Edit Config</button>
+              <button class="wf-small-btn" style="flex:1; background:#F3F4F6; color:#374151; padding:8px;">Withdraw</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- SECTION 10: COMPLIANCE & LEGAL -->
+<div class="section page-break" id="compliance">
+  <h1>10. Compliance &amp; Legal Strategy</h1>
+  <p>Coin follows the proven compliance playbook established by Pump.fun, Axiom, Bankr, and dYdX &mdash; platforms that operate at scale in crypto without full US regulatory compliance by combining geo-blocking, disclaimers, and pure onchain settlement.</p>
+
+  <table>
+    <thead>
+      <tr><th>Measure</th><th>Implementation</th><th>Precedent</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>US Geo-Blocking</strong></td><td>Block US IP addresses at CDN level (Vercel Edge Middleware); show disclaimer page</td><td>Axiom, dYdX, Pump.fun</td></tr>
+      <tr><td><strong>Disclaimer</strong></td><td>"Not available to US persons" banner + Terms of Service clause</td><td>Industry standard</td></tr>
+      <tr><td><strong>No KYC</strong></td><td>Pure token-to-token onchain; no fiat touchpoints; no bank accounts</td><td>All DEXs</td></tr>
+      <tr><td><strong>No Fiat</strong></td><td>USDC/EURC is the quote currency; no fiat onramp in V1</td><td>Removes MSB licensing requirements</td></tr>
+      <tr><td><strong>Legal Entity</strong></td><td>Wyoming DAO LLC (~$500 filing); for team equity/grants only</td><td>Common for crypto projects</td></tr>
+      <tr><td><strong>Smart Contract Audit</strong></td><td>Deferred to V2; V1 uses audited library patterns + peer review</td><td>Many early-stage DeFi projects</td></tr>
+      <tr><td><strong>VPN Access</strong></td><td>Cannot technically prevent; disclaimers + geo-block = good faith compliance</td><td>Industry-wide acknowledgment</td></tr>
+    </tbody>
+  </table>
+  <div class="callout callout-warning">
+    <p><strong>Speed-to-Market Tradeoff:</strong> This compliance strategy is explicitly optimized for launch speed. The team monitors regulatory developments (GENIUS Act, SEC guidance on DeFi) and will adapt compliance posture as regulations crystallize. Architecture is designed to support KYC integration if required in the future.</p>
+  </div>
+</div>
+
+<hr>
+
+<!-- SECTION 11: SMART CONTRACT DESIGN -->
+<div class="section page-break" id="contracts">
+  <h1>11. Smart Contract Design (Solana Programs)</h1>
+
+  <h2>11.1 Escrow Program (Rust/Anchor)</h2>
+  <p>The escrow program is the core of Coin's settlement layer. It implements a two-phase commit pattern: sellers lock tokens by calling <code>create_offer()</code>, and buyers complete trades by calling <code>accept_offer()</code>. The program holds tokens in PDAs and releases both sides atomically.</p>
+
+  <table>
+    <thead>
+      <tr><th>Instruction</th><th>Caller</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>create_offer(token, amount, price, min_fill)</code></td><td>Seller</td><td>Transfers seller's tokens to escrow PDA; emits OfferCreated event</td></tr>
+      <tr><td><code>accept_offer(offer_id)</code></td><td>Buyer</td><td>Buyer sends USDC to escrow PDA; program verifies and releases both sides atomically</td></tr>
+      <tr><td><code>cancel_offer(offer_id)</code></td><td>Seller</td><td>Returns locked tokens to seller; only if not yet accepted</td></tr>
+      <tr><td><code>claim_timeout(offer_id)</code></td><td>Anyone</td><td>After 15-min timeout, returns tokens to seller; resets offer status</td></tr>
+      <tr><td><code>set_fee_rate(rate)</code></td><td>Owner (multisig)</td><td>Updates fee percentage; capped at 1% maximum</td></tr>
+      <tr><td><code>withdraw_fees(token)</code></td><td>Owner (multisig)</td><td>Withdraws accumulated protocol fees to treasury</td></tr>
+    </tbody>
+  </table>
+
+  <h2>11.2 Security Approach</h2>
+  <p>V1 contract is intentionally simple &mdash; minimize attack surface. Security measures:</p>
+  <ul>
+    <li>Program is small (~300 instructions equivalent) and auditable</li>
+    <li>Uses well-tested Anchor patterns and SPL token library</li>
+    <li>Reentrancy protection via Anchor's built-in checks</li>
+    <li>Pausability for emergency stops</li>
+    <li>Fee rate cap (max 1%) enforced in program</li>
+    <li>Timelock on admin functions</li>
+    <li>Peer review by team before deployment</li>
+    <li>Per-trade escrow caps at launch (progressive trust limits)</li>
+    <li>Formal audit planned for V2 after revenue justifies cost ($30&ndash;80K)</li>
+  </ul>
+
+  <h2>11.3 Agent Identity Program</h2>
+  <p>Implements on-chain agent identity using Metaplex Bubblegum compressed NFTs. Each agent is represented by a non-transferable cNFT bound to the operator's wallet. The cNFT stores agent metadata (name, capabilities, operator). Uses DAS API for reads.</p>
+</div>
+
+<hr>
+
+<!-- SECTION 12: DEVELOPMENT TIMELINE -->
+<div class="section page-break" id="timeline">
+  <h1>12. Development Timeline</h1>
+  <p>The project follows a two-stage approach: a <strong>4-week bootstrapped MVP</strong> to demonstrate core functionality and secure funding, followed by a <strong>funded full build</strong> to production launch.</p>
+
+  <h2>MVP Phase 1: Investor Demo (Weeks 1&ndash;4) &mdash; Near-Zero Cost</h2>
+  <div class="callout">
+    <p><strong>The single goal of the MVP is to demonstrate agent-to-agent P2P trading working on Solana &mdash; real escrow-settled trades between AI agents, not a mockup.</strong></p>
+    <p>This is the fundraising asset. Investors need to see the core mechanism functioning: agents posting offers, agents accepting offers, atomic escrow settlement, Jupiter price reference, and the flywheel in action.</p>
+  </div>
+
+  <h3>Week 1: Escrow Program + Agent Wallets</h3>
+  <ul>
+    <li>Deploy escrow Anchor program on Solana devnet (two-phase commit: create_offer, accept_offer, cancel_offer)</li>
+    <li>Create programmatic agent wallets (Solana keypairs)</li>
+    <li>Fetch Jupiter aggregator prices for SOL/USDC reference pricing</li>
+    <li>Fund agent wallets with devnet SOL + USDC</li>
+    <li><strong>Milestone:</strong> Two wallets can escrow-settle a token swap on devnet</li>
+  </ul>
+
+  <h3>Week 2: Agent Runtime + Offer Engine</h3>
+  <ul>
+    <li>Build agent runtime (TypeScript): monitor Jupiter prices, calculate spread, post offers</li>
+    <li>Implement offer creation and acceptance via escrow program</li>
+    <li>Deploy 2&ndash;3 Coin-operated agents quoting SOL/USDC on devnet</li>
+    <li>Agents trading with each other automatically &mdash; posting, accepting, settling</li>
+    <li>Simple backend API (Next.js API routes + Convex) to store/query offers and trades</li>
+    <li><strong>Milestone:</strong> Agents autonomously trading with each other on devnet, visible in database</li>
+  </ul>
+
+  <h3>Week 3: Web UI + Live Demo</h3>
+  <ul>
+    <li>Minimal web app (Next.js on Vercel): marketplace feed showing live agent offers</li>
+    <li>Jupiter price reference displayed alongside each offer</li>
+    <li>Real-time trade feed showing completed agent-to-agent trades</li>
+    <li>Basic wallet connection so a human can accept an agent's offer</li>
+    <li>Trade detail view showing escrow settlement on Solana explorer</li>
+    <li><strong>Milestone:</strong> Web app showing live agent trading activity, human can execute a trade</li>
+  </ul>
+
+  <h3>Week 4: Polish + Investor Deck Integration</h3>
+  <ul>
+    <li>UI polish: loading states, trade confirmation animations, mobile responsive</li>
+    <li>Deploy agents on Solana mainnet with small real funds ($50&ndash;200 USDC per agent)</li>
+    <li>Record demo video of agents trading in real-time</li>
+    <li>Prepare investor demo flow</li>
+    <li>Landing page at coin.family with pitch + demo link</li>
+    <li><strong>Milestone:</strong> Working product demo on mainnet ready for investor meetings</li>
+  </ul>
+
+  <h3>MVP Success Criteria</h3>
+  <table>
+    <thead><tr><th>Criteria</th><th>Target</th></tr></thead>
+    <tbody>
+      <tr><td>Escrow program deployed</td><td>Devnet + Mainnet</td></tr>
+      <tr><td>Agents autonomously posting offers</td><td>2&ndash;3 agents, SOL/USDC pair</td></tr>
+      <tr><td>Agent-to-agent trades settling</td><td>10+ trades per day</td></tr>
+      <tr><td>Spread vs Jupiter</td><td>-0.05% to -0.1% better</td></tr>
+      <tr><td>Settlement time</td><td>&lt;2 seconds</td></tr>
+      <tr><td>Human can accept an agent offer</td><td>Working in web UI</td></tr>
+      <tr><td>Live trade feed</td><td>Real-time updates</td></tr>
+      <tr><td>Total infrastructure cost</td><td>&lt;$50/month (free tiers)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>MVP Infrastructure (Free/Near-Free)</h3>
+  <table>
+    <thead><tr><th>Service</th><th>Plan</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td>Vercel</td><td>Free tier (hobby)</td><td>$0</td></tr>
+      <tr><td>Convex</td><td>Free tier (Starter plan)</td><td>$0</td></tr>
+      <tr><td>Helius RPC</td><td>Free tier (100K credits/day)</td><td>$0</td></tr>
+      <tr><td>Solana devnet</td><td>Free</td><td>$0</td></tr>
+      <tr><td>Solana mainnet (agent funds)</td><td>$50&ndash;200 USDC seed</td><td>One-time</td></tr>
+      <tr><td>Domain (coin.family)</td><td>Already owned</td><td>$0</td></tr>
+      <tr><td><strong>Total monthly</strong></td><td></td><td><strong>&lt;$50</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>MVP Explicitly NOT Included</h3>
+  <div class="out-of-scope">
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> User authentication / onboarding (agents only for MVP)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> .sol domain registration</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Reputation system</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Agent identity cNFTs</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Privacy features</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Geo-blocking</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Multiple token pairs (SOL/USDC only for MVP)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Agent configuration UI (agents configured by team directly)</div>
+    <div class="out-of-scope-item"><span class="oos-x">&#10005;</span> Tutorial / demo mode</div>
+  </div>
+
+  <hr>
+
+  <h2>MVP Phase 2: Full Product Build (Weeks 5&ndash;16, Post-Funding) &mdash; ~$200&ndash;350K</h2>
+  <p>After MVP Phase 1 secures funding, the full product build begins. MVP Phase 2 transforms the agent-to-agent demo into a complete consumer product with authentication, identity, wallets, reputation, a full marketplace UI, and public launch on Solana mainnet. The build is divided into three sub-phases across 12 weeks.</p>
+
+  <h3>Phase 2a: Core Infrastructure (Weeks 5&ndash;8)</h3>
+  <ul>
+    <li>Privy auth integration (X + Farcaster + email login)</li>
+    <li>Embedded wallet creation for humans (Privy)</li>
+    <li>SNS / Bonfida .sol domain registration in onboarding</li>
+    <li>Agent identity cNFT minting (Metaplex Bubblegum)</li>
+    <li>Convex schema expansion: users, agents, offers, trades, ratings, timeout_logs</li>
+    <li>Convex server functions: offers CRUD, trades, user management (fully type-safe, no ORM)</li>
+    <li>Convex real-time subscriptions for live offer updates</li>
+    <li>Expand to all 14 V1 listed tokens</li>
+    <li>Scale to 10&ndash;20 Coin-operated agents</li>
+    <li><strong>Deliverable:</strong> Full backend with wallet + identity + escrow + auth on devnet</li>
+  </ul>
+
+  <h3>Phase 2b: Full Marketplace (Weeks 9&ndash;12)</h3>
+  <ul>
+    <li>Full marketplace UI: buyers/sellers market toggle, desktop table + mobile cards</li>
+    <li>Buy/sell flows (wallet approval &rarr; escrow &rarr; settlement)</li>
+    <li>Agent configuration wizard (post-first-trade prompt)</li>
+    <li>Agent execution loop (event-driven + cron fallback)</li>
+    <li>Reputation scoring engine</li>
+    <li>Counterparty rating system (post-trade 1&ndash;5 stars)</li>
+    <li>Profile/wallet management dashboard</li>
+    <li>Live trade feed + Demo/tutorial mode</li>
+    <li><strong>Deliverable:</strong> Fully functional exchange on devnet</li>
+  </ul>
+
+  <h3>Phase 2c: Security, Beta &amp; Launch (Weeks 13&ndash;16)</h3>
+  <ul>
+    <li>Security review (peer review + audited library patterns)</li>
+    <li>Geo-blocking (Vercel Edge Middleware + disclaimers)</li>
+    <li>Performance optimization + privacy features</li>
+    <li>UI/UX polish pass + mobile responsiveness</li>
+    <li>Devnet &rarr; Solana mainnet migration</li>
+    <li>Deploy all Coin-operated agents on mainnet</li>
+    <li>Closed beta with 20&ndash;50 testers &rarr; Bug fixes &rarr; Public launch</li>
+    <li><strong>Deliverable:</strong> Public launch on Solana mainnet</li>
+  </ul>
+
+  <p><strong>MVP Phase 1:</strong> 4 weeks (near-zero cost, free-tier infrastructure + ~$200 mainnet seed)<br>
+  <strong>MVP Phase 2:</strong> ~3 months / 12 weeks (post-funding, ~$200&ndash;350K)<br>
+  <strong>Total:</strong> ~4 months (16 weeks)</p>
+
+  <h2>Development Gantt Chart</h2>
+  <div class="mermaid">
+gantt
+    title Coin Development Timeline
+    dateFormat YYYY-MM-DD
+    axisFormat %b %d
+
+    section MVP Phase 1 (Wks 1-4)
+    Escrow Program + Wallets       :mvp1, 2026-03-02, 7d
+    Agent Runtime + Offer Engine   :mvp2, after mvp1, 7d
+    Web UI + Live Demo             :mvp3, after mvp2, 7d
+    Polish + Mainnet Deploy        :mvp4, after mvp3, 7d
+    MVP Phase 1 Complete           :milestone, mvpm, after mvp4, 0d
+
+    section Funding
+    Investor Meetings              :fund, 2026-03-30, 21d
+
+    section Phase 2a (Wks 5-8)
+    Auth + Identity + Wallets      :p1, 2026-04-21, 28d
+    Full API + Multi-pair           :p1b, 2026-04-21, 28d
+
+    section Phase 2b (Wks 9-12)
+    Marketplace UI                 :p2, after p1, 28d
+    Reputation + Ratings           :p2b, after p1, 28d
+
+    section Phase 2c (Wks 13-16)
+    Security + Geo-blocking        :p3, after p2, 14d
+    Beta Testing                   :p3b, after p3, 7d
+    Public Launch                  :milestone, launch, after p3b, 1d
+  </div>
+  <p class="diagram-caption">Figure 12.1 &mdash; Full Development Timeline (MVP Phase 1 + Funding + MVP Phase 2)</p>
+</div>
+
+<hr>
+
+<!-- SECTION 13: SUCCESS METRICS -->
+<div class="section page-break" id="metrics">
+  <h1>13. Success Metrics</h1>
+
+  <h2>13.1 Launch Targets (First 30 Days)</h2>
+  <table>
+    <thead><tr><th>Metric</th><th>Target</th><th>Measurement</th><th>Why It Matters</th></tr></thead>
+    <tbody>
+      <tr><td>Daily GMV</td><td>$50K+</td><td>Sum of all settled trades (USDC equiv)</td><td>Core health metric; proves PMF</td></tr>
+      <tr><td>Active Agents</td><td>50+</td><td>Agents with &ge;1 trade in last 7 days</td><td>Network effect; more agents = better prices</td></tr>
+      <tr><td>Active Traders</td><td>100+</td><td>Users with &ge;1 trade in last 7 days</td><td>Demand side validation</td></tr>
+      <tr><td>Avg Settlement Time</td><td>&lt;2 seconds</td><td>From buyer acceptance to settlement</td><td>UX quality; competitive advantage</td></tr>
+      <tr><td>Settlement Success Rate</td><td>&gt;99%</td><td>Settled / (settled + failed)</td><td>Reliability; trust signal</td></tr>
+      <tr><td>Spread vs Jupiter</td><td>-0.05% to -0.1%</td><td>Coin best price vs Jupiter for same pair</td><td>Value proposition proof</td></tr>
+      <tr><td>Escrow Timeout Rate</td><td>&lt;5%</td><td>Timed-out / total initiated</td><td>Marketplace efficiency</td></tr>
+      <tr><td>User Retention (D7)</td><td>&gt;30%</td><td>Users who return within 7 days</td><td>Stickiness</td></tr>
+    </tbody>
+  </table>
+
+  <h2>13.2 North Star Metric</h2>
+  <p><strong>Daily GMV.</strong> It captures both supply (agents/sellers posting offers) and demand (buyers accepting). All other metrics are leading indicators.</p>
+
+  <h2>13.3 Scale Targets</h2>
+  <table>
+    <thead><tr><th>Scenario</th><th>Daily GMV</th><th>Annual GMV</th><th>Annual Revenue (0.3%)</th></tr></thead>
+    <tbody>
+      <tr><td>Launch (50 agents)</td><td>$50K</td><td>$18.25M</td><td>$55K</td></tr>
+      <tr><td>Growth (500 agents + 2K humans)</td><td>$500K</td><td>$182.5M</td><td>$547K</td></tr>
+      <tr><td>Scale (5K agents + 20K humans)</td><td>$5M</td><td>$1.825B</td><td>$5.5M</td></tr>
+      <tr><td>Mature (50K agents + 100K humans)</td><td>$50M</td><td>$18.25B</td><td>$54.7M</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- SECTION 14: RISKS & MITIGATIONS -->
+<div class="section page-break" id="risks">
+  <h1>14. Risks &amp; Mitigations</h1>
+  <table>
+    <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Smart contract exploit</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td><span class="sev-high">Critical</span></td>
+        <td>Audited patterns, peer review, small initial TVL, pausability, bug bounty in V2</td>
+      </tr>
+      <tr>
+        <td><strong>Coin-operated agents lose more than budgeted</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td>Hard daily loss cap in code; manual monitoring; kill switch</td>
+      </tr>
+      <tr>
+        <td><strong>Cold start: no organic users</strong></td>
+        <td><span class="sev-high">High</span></td>
+        <td><span class="sev-high">High</span></td>
+        <td>Coin-operated agents create visible volume; launch with crypto Twitter community; better rates than Jupiter</td>
+      </tr>
+      <tr>
+        <td><strong>US regulatory action</strong></td>
+        <td><span class="sev-low">Low</span></td>
+        <td><span class="sev-high">High</span></td>
+        <td>Geo-blocking + disclaimers; Wyoming DAO LLC; architecture supports KYC if needed</td>
+      </tr>
+      <tr>
+        <td><strong>Jupiter/Raydium builds P2P features</strong></td>
+        <td><span class="sev-low">Low</span></td>
+        <td><span class="sev-high">High</span></td>
+        <td>Move fast, build network effects. DEXs focused on AMM, not P2P relationships and reputation</td>
+      </tr>
+      <tr>
+        <td><strong>Solana network congestion</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td>Priority fees, dedicated RPC (Helius), graceful degradation. Escrow timeouts protect against stuck txs</td>
+      </tr>
+      <tr>
+        <td><strong>Wallet infrastructure choice fails</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td>MVP Phase 2a spike evaluates multiple providers. Fallback options available</td>
+      </tr>
+      <tr>
+        <td><strong>Price oracle stale or unavailable</strong></td>
+        <td><span class="sev-low">Low</span></td>
+        <td><span class="sev-high">High</span></td>
+        <td>Multiple sources (Jupiter + Pyth + CoinGecko API). If all fail, agents pause; UI shows warning</td>
+      </tr>
+      <tr>
+        <td><strong>Team execution risk</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td><span class="sev-high">High</span></td>
+        <td>Prioritized feature list; scope cuts defined; MVP over perfection</td>
+      </tr>
+      <tr>
+        <td><strong>Third-party agents don't materialize</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td>Coin-operated agents provide baseline liquidity indefinitely; publish agent economics docs</td>
+      </tr>
+      <tr>
+        <td><strong>Marketplace griefing (spam, timeout abuse)</strong></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td>Timeout tracking + auto-restriction; minimum offer amounts ($1 USDC); reputation-gated features</td>
+      </tr>
+      <tr>
+        <td><strong>Agent wallet compromise</strong></td>
+        <td><span class="sev-low">Low</span></td>
+        <td><span class="sev-med">Medium</span></td>
+        <td>Spending limits per-trade and per-day; anomaly detection; user can revoke instantly</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- SECTION 15: OPEN QUESTIONS -->
+<div class="section page-break" id="open-questions">
+  <h1>15. Open Questions</h1>
+  <ol>
+    <li><strong>Fee structure:</strong> 0.3% total (2AM's model: 0.15% each side + 0.05% agent platform fee) vs 0.5% (original: 0.25% each side). Lower fees attract volume but reduce revenue per trade. Team to model and decide.</li>
+    <li><strong>Escrow design:</strong> Two-phase commit (seller locks first, buyer sends second) vs fully atomic (both fund simultaneously). Two-phase is simpler but has the 15-min timeout problem. Team leans two-phase.</li>
+    <li><strong>Agent pricing strategy:</strong> Static offset from Jupiter vs dynamic based on volatility/volume? V1 uses static; dynamic is V2.</li>
+    <li><strong>Reputation weight initialization:</strong> Current weights (0.15T + 0.20V + 0.25S + 0.40C) need simulation before launch.</li>
+    <li><strong>Token listing criteria:</strong> What volume/liquidity thresholds must a Solana token meet to be listed? Who decides?</li>
+    <li><strong>Legal entity timing:</strong> Wyoming DAO LLC filing before or after funding applications?</li>
+    <li><strong>Contributor agreement formalization:</strong> 20% equal split established &mdash; vesting, active contribution requirements, and exit terms must be documented before MVP Phase 2.</li>
+    <li><strong>Wallet provider:</strong> Privy embedded vs Phantom embedded vs Turnkey vs Crossmint. Phase 2a spike determines.</li>
+    <li><strong>Agent framework:</strong> Custom TypeScript agent vs Solana Agent Kit vs ElizaOS-based? Evaluate MVP Phase 1&ndash;2a.</li>
+    <li><strong>x402 threshold:</strong> When to use x402 vs escrow for small trades? Current lean: escrow for all user-facing trades; x402 for agent-to-agent service fees only. Revisit V2.</li>
+    <li><strong>Partial fills:</strong> V1 is full-fill only. When to add partial fills? Adds contract complexity. Likely V2.</li>
+    <li><strong>Jupiter price fallback:</strong> If Jupiter reference price is stale or unavailable? Fallback to Pyth/Switchboard on-chain oracle + CoinGecko API. If all fail, agents pause; UI shows warning.</li>
+  </ol>
+</div>
+
+<hr>
+
+<!-- SECTION 16: REFERENCES -->
+<div class="section page-break" id="references">
+  <h1>16. References</h1>
+  <ol>
+    <li>Solana Foundation, "Solana Documentation," 2024&ndash;2026. <a href="https://docs.solana.com">docs.solana.com</a></li>
+    <li>Jupiter Exchange, "Jupiter Aggregator," 2024&ndash;2026. <a href="https://jup.ag">jup.ag</a></li>
+    <li>Bonfida, "Solana Name Service," 2024&ndash;2026. <a href="https://naming.bonfida.org">naming.bonfida.org</a></li>
+    <li>Metaplex, "Bubblegum &mdash; Compressed NFTs," 2024&ndash;2026. <a href="https://developers.metaplex.com/bubblegum">developers.metaplex.com/bubblegum</a></li>
+    <li>Anchor Framework, "Solana Smart Contract Development," 2024&ndash;2026. <a href="https://www.anchor-lang.com">anchor-lang.com</a></li>
+    <li>Helius, "Solana RPC and DAS API," 2024&ndash;2026. <a href="https://helius.dev">helius.dev</a></li>
+    <li>Privy, "Embedded Wallets and Auth," 2024&ndash;2026. <a href="https://privy.io">privy.io</a></li>
+    <li>Raydium, "Solana AMM and CLMM," 2024&ndash;2026. <a href="https://raydium.io">raydium.io</a></li>
+    <li>Orca, "Whirlpools Concentrated Liquidity," 2024&ndash;2026. <a href="https://orca.so">orca.so</a></li>
+    <li>Jito Labs, "MEV on Solana," 2024&ndash;2026. <a href="https://jito.wtf">jito.wtf</a></li>
+    <li>Circle, "USDC on Solana," 2024&ndash;2026. <a href="https://www.circle.com/usdc">circle.com/usdc</a></li>
+    <li>Circle, "EURC &mdash; Euro Stablecoin," 2024&ndash;2026. <a href="https://www.circle.com/eurc">circle.com/eurc</a></li>
+    <li>Convex, "The Fullstack TypeScript Development Platform," 2024&ndash;2026. <a href="https://convex.dev">convex.dev</a></li>
+    <li>Coinbase, "x402 Protocol," 2025&ndash;2026. <a href="https://github.com/coinbase/x402">github.com/coinbase/x402</a></li>
+    <li>Neynar, "Farcaster API and Neynar Score," 2024&ndash;2026. <a href="https://neynar.com">neynar.com</a></li>
+  </ol>
+</div>
+
+<!-- TEAM SECTION -->
+<div class="section page-break">
+  <h1>Team</h1>
+  <table>
+    <thead>
+      <tr><th>Handle</th><th>Role</th><th>Equity</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>satsbased</strong></td><td>Product Vision &amp; Partnerships &mdash; Original concept creator, continuous research, PMF analysis, strategy</td><td>20%</td></tr>
+      <tr><td><strong>wes</strong></td><td>Product / Engineering &mdash; Corporate product management, PRD/wireframes/architecture</td><td>20%</td></tr>
+      <tr><td><strong>2AM</strong></td><td>Product / Engineering &mdash; 100K+ monthly user experience, technical architecture, revenue modeling</td><td>20%</td></tr>
+      <tr><td><strong>dEXploarer</strong></td><td>Engineering Lead &amp; Product Branding &mdash; AI development, technical doc reviews, data layer strategy</td><td>20%</td></tr>
+      <tr><td><strong>0xJ0hnny.eth</strong></td><td>Web3 DApp Engineer &mdash; Years of web3 dapp development, Farcaster/social integration</td><td>20%</td></tr>
+    </tbody>
+  </table>
+  <p>Partnership formalized 2/20/2026. Contributor agreement (vesting, active contribution requirements, buyout/exit terms) to be documented before MVP Phase 2. Post-funding development estimate: <strong>$200&ndash;350K</strong> (infrastructure ~$4K/mo, audit $30&ndash;80K deferred, legal $20&ndash;50K).</p>
+</div>
+
+</div><!-- end .container -->
+
+</body>
+</html>

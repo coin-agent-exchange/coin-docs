@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coin — Architecture Decision Record (ADR-001)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #111827;
+      background: #FFFFFF;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+    /* Cover */
+    .cover {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; text-align: center; padding: 80px 24px;
+    }
+    .cover-logo { font-size: 72px; font-weight: 700; color: #2563EB; letter-spacing: -2px; margin-bottom: 24px; }
+    .cover-subtitle { font-size: 24px; font-weight: 500; color: #111827; margin-bottom: 12px; }
+    .cover-adr-id { font-size: 18px; font-weight: 600; color: #2563EB; margin-bottom: 8px; }
+    .cover-url { font-size: 18px; color: #6B7280; margin-bottom: 8px; }
+    .cover-date { font-size: 16px; color: #6B7280; margin-bottom: 80px; }
+    .cover-confidential {
+      font-size: 13px; font-weight: 600; color: #6B7280; text-transform: uppercase;
+      letter-spacing: 2px; border-top: 1px solid #E5E7EB; padding-top: 24px;
+    }
+
+    /* Typography */
+    h1 { font-size: 28px; font-weight: 700; color: #111827; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 3px solid #2563EB; }
+    h2 { font-size: 22px; font-weight: 700; color: #111827; margin-top: 40px; margin-bottom: 16px; }
+    h3 { font-size: 18px; font-weight: 600; color: #1E40AF; margin-top: 32px; margin-bottom: 12px; }
+    h4 { font-size: 16px; font-weight: 600; color: #111827; margin-top: 24px; margin-bottom: 8px; }
+    p { margin-bottom: 16px; }
+    ul, ol { margin-bottom: 16px; padding-left: 24px; }
+    li { margin-bottom: 6px; }
+    a { color: #2563EB; text-decoration: none; }
+    a:hover { color: #1E40AF; text-decoration: underline; }
+    code { background: #F3F4F6; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', 'Fira Code', monospace; }
+    hr { border: none; border-top: 1px solid #E5E7EB; margin: 48px 0; }
+    strong { font-weight: 600; }
+
+    /* Sections */
+    .section { padding: 48px 0; }
+    .page-break { page-break-before: always; }
+
+    /* TOC */
+    .toc { padding: 48px 0; }
+    .toc ol { list-style: none; counter-reset: toc; padding: 0; }
+    .toc > ol > li { counter-increment: toc; margin-bottom: 10px; }
+    .toc > ol > li > a { font-size: 16px; font-weight: 500; display: flex; align-items: baseline; gap: 10px; }
+    .toc > ol > li > a::before { content: counter(toc) "."; color: #2563EB; font-weight: 700; min-width: 28px; }
+    .toc > ol > li > ol { list-style: none; padding-left: 38px; margin-top: 6px; }
+    .toc > ol > li > ol > li { margin-bottom: 4px; }
+    .toc > ol > li > ol > li > a { font-size: 14px; color: #6B7280; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+    thead th { background: #2563EB; color: #FFFFFF; font-weight: 600; padding: 12px 16px; text-align: left; }
+    thead th:first-child { border-top-left-radius: 8px; }
+    thead th:last-child { border-top-right-radius: 8px; }
+    tbody td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; vertical-align: top; }
+    tbody tr:nth-child(even) { background: #F9FAFB; }
+
+    /* Callout */
+    .callout { background: #DBEAFE; border-left: 4px solid #2563EB; border-radius: 0 8px 8px 0; padding: 20px 24px; margin: 24px 0; }
+    .callout p { margin-bottom: 8px; }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout-warning { background: #FEF3C7; border-left-color: #D97706; }
+    .callout-success { background: #D1FAE5; border-left-color: #059669; }
+    .callout-danger { background: #FEE2E2; border-left-color: #DC2626; }
+
+    /* Decision badges */
+    .decision-accepted { background: #D1FAE5; color: #065F46; padding: 4px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; display: inline-block; }
+    .decision-rejected { background: #FEE2E2; color: #991B1B; padding: 4px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; display: inline-block; }
+    .decision-deferred { background: #FEF3C7; color: #92400E; padding: 4px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; display: inline-block; }
+    .decision-open { background: #DBEAFE; color: #1E40AF; padding: 4px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; display: inline-block; }
+
+    /* ADR card */
+    .adr-card {
+      background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 12px;
+      padding: 24px; margin: 24px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .adr-card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #F3F4F6;
+    }
+    .adr-card-title { font-size: 16px; font-weight: 700; color: #111827; }
+    .adr-card-section { margin-bottom: 16px; }
+    .adr-card-section:last-child { margin-bottom: 0; }
+    .adr-card-label { font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+
+    /* Comparison grid */
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+    .compare-col { background: #F9FAFB; border-radius: 12px; padding: 20px; }
+    .compare-col h4 { margin-top: 0; font-size: 14px; color: #6B7280; margin-bottom: 12px; }
+    .compare-col ul { font-size: 14px; margin-bottom: 0; }
+    .compare-col.selected { background: #DBEAFE; border: 2px solid #2563EB; }
+    .compare-col.rejected { background: #FEF3F3; border: 1px solid #E5E7EB; opacity: 0.7; }
+
+    /* Severity badges (reused from PRD) */
+    .sev-high { background: #FEE2E2; color: #991B1B; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .sev-med { background: #FEF3C7; color: #92400E; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .sev-low { background: #D1FAE5; color: #065F46; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+    /* Summary box */
+    .summary-box {
+      background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px;
+      padding: 24px 28px; margin: 24px 0;
+    }
+    .summary-item {
+      display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; font-size: 14px;
+    }
+    .summary-item:last-child { margin-bottom: 0; }
+    .summary-icon { font-size: 16px; flex-shrink: 0; }
+
+    /* Meta table */
+    .meta-table { margin: 24px 0; }
+    .meta-row { display: flex; border-bottom: 1px solid #F3F4F6; padding: 10px 0; }
+    .meta-label { width: 160px; font-size: 13px; font-weight: 600; color: #6B7280; flex-shrink: 0; }
+    .meta-value { font-size: 14px; color: #111827; }
+
+    @media print {
+      .cover { min-height: auto; padding: 120px 24px; }
+      .page-break { page-break-before: always; }
+      .callout { break-inside: avoid; }
+      .adr-card { break-inside: avoid; }
+      table { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============ COVER PAGE ============ -->
+<div class="cover">
+  <div class="cover-logo">Coin</div>
+  <div class="cover-subtitle">Architecture Decision Record</div>
+  <div class="cover-adr-id">ADR-001: Technical Stack &amp; Infrastructure Alignment</div>
+  <div class="cover-url">coin.family</div>
+  <div class="cover-date">February 22, 2026</div>
+  <div class="cover-confidential">Confidential &mdash; Internal Team Only</div>
+</div>
+
+<!-- ============ TOC ============ -->
+<div class="container">
+  <div class="toc page-break">
+    <h1>Table of Contents</h1>
+    <ol>
+      <li><a href="#context">Context &amp; Purpose</a></li>
+      <li><a href="#summary">Decision Summary</a></li>
+      <li><a href="#adr-auth">ADR-001a: Authentication Provider</a></li>
+      <li><a href="#adr-backend">ADR-001b: Backend Architecture</a></li>
+      <li><a href="#adr-repo">ADR-001c: Repository Structure</a></li>
+      <li><a href="#adr-hosting">ADR-001d: Cloud Platform &amp; Hosting</a></li>
+      <li><a href="#adr-environments">ADR-001e: QA &amp; Production Environments</a></li>
+      <li><a href="#adr-vectordb">ADR-001f: Vector Database</a></li>
+      <li><a href="#adr-state">ADR-001g: State Management &amp; Patterns</a></li>
+      <li><a href="#alignment">Blueprint vs PRD/Roadmap Alignment</a></li>
+      <li><a href="#adopted">Patterns Adopted from Blueprint</a></li>
+      <li><a href="#next-steps">Next Steps</a></li>
+    </ol>
+  </div>
+
+  <!-- ============ 1. CONTEXT ============ -->
+  <div class="section page-break" id="context">
+    <h1>1. Context &amp; Purpose</h1>
+
+    <p>This Architecture Decision Record (ADR) aligns the team on key technical decisions for Coin &mdash; a peer-to-peer token exchange on Solana where humans and AI agents trade tokens directly with each other.</p>
+
+    <p>Two documents currently define Coin's technical direction:</p>
+    <ul>
+      <li><strong>PRD v2 + Product Roadmap</strong> &mdash; The team-approved product specification defining the MVP (4-week agent-to-agent demo) and the post-funding V1 build (12 weeks to public launch). Focused on a P2P token exchange with escrow settlement on Solana.</li>
+      <li><strong>Architecture Blueprint</strong> (dEXploarer) &mdash; A comprehensive technical architecture document describing infrastructure, patterns, and technology choices. Scoped as a broader "fintech super-app" covering banking, cards, investments, payments, rewards, and social features.</li>
+    </ul>
+
+    <p>These two documents have meaningful overlap <em>and</em> meaningful conflicts. This ADR resolves the conflicts, records the decisions, and ensures every team member is building on the same foundation.</p>
+
+    <div class="meta-table">
+      <div class="meta-row">
+        <div class="meta-label">Status</div>
+        <div class="meta-value"><span class="decision-open">Proposed &mdash; Pending Team Review</span></div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Authors</div>
+        <div class="meta-value">wes, dEXploarer</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Reviewers</div>
+        <div class="meta-value">satsbased, 2AM, cody</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Date</div>
+        <div class="meta-value">February 22, 2026</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Scope</div>
+        <div class="meta-value">MVP Phase 1 (Weeks 1&ndash;4) + V1 (Weeks 5&ndash;16)</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">References</div>
+        <div class="meta-value">PRD v2, Product Roadmap, Architecture Blueprint v1.0</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p><strong>How to read this document:</strong> Each decision is presented as a card with Context (why the decision is needed), Options Considered (what we evaluated), Decision (what we chose), and Consequences (trade-offs and implications). Decisions marked <span class="decision-accepted">Accepted</span> are final for MVP. Decisions marked <span class="decision-deferred">Deferred</span> will be revisited post-funding.</p>
+    </div>
+  </div>
+
+  <!-- ============ 2. DECISION SUMMARY ============ -->
+  <div class="section page-break" id="summary">
+    <h1>2. Decision Summary</h1>
+
+    <p>Quick reference for all decisions in this ADR. Details follow in subsequent sections.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Decision</th>
+          <th>Choice</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>001a</strong></td>
+          <td>Authentication Provider</td>
+          <td>Privy</td>
+          <td><span class="decision-accepted">Accepted</span></td>
+        </tr>
+        <tr>
+          <td><strong>001b</strong></td>
+          <td>Backend Architecture</td>
+          <td>Convex (data) + Hono (compute/webhooks) &mdash; no full microservices for MVP</td>
+          <td><span class="decision-accepted">Accepted</span></td>
+        </tr>
+        <tr>
+          <td><strong>001c</strong></td>
+          <td>Repository Structure</td>
+          <td>Multi-repo (5 repos) &mdash; evaluate monorepo at V2</td>
+          <td><span class="decision-accepted">Accepted</span></td>
+        </tr>
+        <tr>
+          <td><strong>001d</strong></td>
+          <td>Cloud Platform &amp; Hosting</td>
+          <td>Vercel (web) + Convex Cloud &rarr; Self-Hosted (backend) + Railway (agents + Hono)</td>
+          <td><span class="decision-accepted">Accepted</span></td>
+        </tr>
+        <tr>
+          <td><strong>001e</strong></td>
+          <td>QA &amp; Production Environments</td>
+          <td>Devnet + Preview = QA; Mainnet + Production = Prod</td>
+          <td><span class="decision-accepted">Accepted</span></td>
+        </tr>
+        <tr>
+          <td><strong>001f</strong></td>
+          <td>Vector Database</td>
+          <td>None for MVP &mdash; revisit at V2+</td>
+          <td><span class="decision-deferred">Deferred</span></td>
+        </tr>
+        <tr>
+          <td><strong>001g</strong></td>
+          <td>State Management &amp; Patterns</td>
+          <td>Zustand (client) + Convex (server) + Zod validation</td>
+          <td><span class="decision-accepted">Accepted</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ 3. AUTH ============ -->
+  <div class="section page-break" id="adr-auth">
+    <h1>3. ADR-001a: Authentication Provider</h1>
+
+    <div class="adr-card">
+      <div class="adr-card-header">
+        <div class="adr-card-title">Authentication Provider</div>
+        <span class="decision-accepted">Accepted</span>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Context</div>
+        <p style="margin-bottom: 0;">Coin needs authentication that supports social login (X / Farcaster / email), embedded Solana wallets (users never see seed phrases), and MPC or enclave-based key management. The PRD specifies Privy. The Architecture Blueprint specifies Clerk.</p>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Options Considered</div>
+      </div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-col selected">
+        <h4>Privy (Selected)</h4>
+        <ul>
+          <li>Native Solana embedded wallets</li>
+          <li>MPC + enclave-based key management</li>
+          <li>X (Twitter) + Farcaster + email login</li>
+          <li>Social recovery (no seed phrases)</li>
+          <li>Built for crypto-native apps</li>
+          <li>Wallet auto-created on signup</li>
+          <li>Free tier supports MVP</li>
+        </ul>
+      </div>
+      <div class="compare-col rejected">
+        <h4>Clerk (Blueprint)</h4>
+        <ul>
+          <li>SOC 2 Type 2 certified</li>
+          <li>Bot protection + breach detection</li>
+          <li>10K MAU free tier</li>
+          <li>No native Solana wallet support</li>
+          <li>No embedded crypto wallets</li>
+          <li>Would require separate wallet provider</li>
+          <li>Built for traditional web apps</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="adr-card">
+      <div class="adr-card-section">
+        <div class="adr-card-label">Decision</div>
+        <p style="margin-bottom: 0;"><strong>Use Privy for authentication and embedded wallets.</strong> Coin is a crypto-native product where every user needs a Solana wallet. Privy provides auth + wallet as a single integration. Using Clerk would require bolting on a separate wallet provider (Turnkey, Crossmint, or raw keypair management), adding complexity with no benefit.</p>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Consequences</div>
+        <ul style="margin-bottom: 0;">
+          <li>Single SDK handles both auth and wallet provisioning</li>
+          <li>Users sign in with one tap &mdash; no MetaMask, no seed phrases</li>
+          <li>Privy handles key recovery via social login</li>
+          <li>Trade-off: Privy lacks Clerk's bot protection and breach detection features (mitigated by Cloudflare WAF at edge if needed later)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout-warning callout">
+      <p><strong>Open Decision (Phase 2a):</strong> The PRD notes that the final wallet provider choice (Privy embedded vs Phantom embedded vs Turnkey vs Crossmint) will be confirmed during a Phase 2a technical spike. Privy is the default unless the spike reveals a blocker.</p>
+    </div>
+  </div>
+
+  <!-- ============ 4. BACKEND ============ -->
+  <div class="section page-break" id="adr-backend">
+    <h1>4. ADR-001b: Backend Architecture</h1>
+
+    <div class="adr-card">
+      <div class="adr-card-header">
+        <div class="adr-card-title">Backend Architecture</div>
+        <span class="decision-accepted">Accepted &mdash; Revised Feb 23</span>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Context</div>
+        <p style="margin-bottom: 0;">Both the PRD and the Architecture Blueprint agree on Convex as the primary backend. The blueprint additionally proposes 6 Hono-based microservices deployed on Fly.io. Team feedback (dEXploarer) argues that relying solely on Convex Cloud is too limiting &mdash; a Hono server layer alongside Convex provides more control over compute, webhooks, and long-lived connections.</p>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Decision</div>
+        <p style="margin-bottom: 0;"><strong>Convex as the primary data layer + a thin Hono server for compute that doesn't fit serverless.</strong> Not 6 independent microservices &mdash; one Hono process alongside Convex, handling the workloads listed below.</p>
+      </div>
+    </div>
+
+    <h3>Responsibility Split: Convex vs Hono</h3>
+
+    <div class="compare-grid">
+      <div class="compare-col selected">
+        <h4>Convex (Data Layer &mdash; Primary)</h4>
+        <ul>
+          <li>Offer CRUD (create, accept, cancel)</li>
+          <li>Real-time subscriptions (marketplace feed)</li>
+          <li>User data, agent config, reputation</li>
+          <li>Scheduling (cron jobs, cleanup)</li>
+          <li>File storage (KYC docs, avatars)</li>
+          <li>ACID transactions for state changes</li>
+          <li>Optimistic updates for UI</li>
+        </ul>
+      </div>
+      <div class="compare-col selected">
+        <h4>Hono (Compute Layer &mdash; Companion)</h4>
+        <ul>
+          <li>Webhook receivers (Privy, Solana tx confirmations)</li>
+          <li>Agent health checks &amp; admin API</li>
+          <li>WebSocket fan-out for price feeds</li>
+          <li>Long-running compute (batch operations)</li>
+          <li>External API orchestration</li>
+          <li>Rate limiting &amp; request validation</li>
+          <li>Any future PCI-isolated processing</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Blueprint Microservices &mdash; MVP Mapping</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Blueprint Microservice</th>
+          <th>Coin Equivalent</th>
+          <th>MVP Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Trading Engine (Hono)</td>
+          <td>On-chain escrow + Convex offer management</td>
+          <td>Convex + escrow program (no separate service)</td>
+        </tr>
+        <tr>
+          <td>Payment Processor</td>
+          <td>N/A &mdash; all settlement is on-chain via USDC</td>
+          <td>Not applicable</td>
+        </tr>
+        <tr>
+          <td>Compliance Engine</td>
+          <td>US geo-blocking via Vercel Edge Middleware</td>
+          <td>Middleware only &mdash; no dedicated service</td>
+        </tr>
+        <tr>
+          <td>Notification Service</td>
+          <td>Convex real-time subscriptions</td>
+          <td>Built into Convex</td>
+        </tr>
+        <tr>
+          <td>Market Data Service</td>
+          <td>Jupiter WebSocket price feeds</td>
+          <td>Hono layer in coin-agents handles this</td>
+        </tr>
+        <tr>
+          <td>Analytics Service</td>
+          <td>Not in MVP scope</td>
+          <td>Deferred to V2</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout-success callout">
+      <p><strong>Why this split works:</strong> Convex handles all data operations, real-time sync, and ACID guarantees. Hono handles everything that needs raw HTTP control, long-lived connections, or sits outside Convex's serverless model. This avoids the overhead of 6 independent microservices while still giving us a server layer for compute. The Hono process runs on Railway alongside the agent workers &mdash; no additional infrastructure.</p>
+    </div>
+
+    <div class="adr-card">
+      <div class="adr-card-section">
+        <div class="adr-card-label">When to Split into Separate Services</div>
+        <p style="margin-bottom: 0;">The single Hono process can be split into dedicated microservices in V2+ if: (a) a feature like fiat on-ramp requires PCI-isolated processing, (b) a Python-based ML workload (fraud detection) needs its own runtime, or (c) independent scaling is needed for a specific compute workload. Until then, Convex + one Hono server covers everything.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 5. REPO STRUCTURE ============ -->
+  <div class="section page-break" id="adr-repo">
+    <h1>5. ADR-001c: Repository Structure</h1>
+
+    <div class="adr-card">
+      <div class="adr-card-header">
+        <div class="adr-card-title">Repository Structure</div>
+        <span class="decision-accepted">Accepted</span>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Context</div>
+        <p style="margin-bottom: 0;">The Architecture Blueprint proposes a single Turborepo + pnpm monorepo. The team has already created 5 separate repositories under the <code>coin-agent-exchange</code> GitHub organization.</p>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Decision</div>
+        <p style="margin-bottom: 0;"><strong>Keep the multi-repo structure for MVP and V1. Evaluate monorepo migration for V2.</strong></p>
+      </div>
+    </div>
+
+    <h3>Current Repository Layout</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Repository</th>
+          <th>Technology</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>coin-web</code></td>
+          <td>Next.js + Tailwind</td>
+          <td>Consumer web application</td>
+        </tr>
+        <tr>
+          <td><code>coin-convex</code></td>
+          <td>Convex (TypeScript)</td>
+          <td>Backend: schema, queries, mutations, actions</td>
+        </tr>
+        <tr>
+          <td><code>coin-escrow</code></td>
+          <td>Anchor / Rust</td>
+          <td>Solana escrow program (on-chain settlement)</td>
+        </tr>
+        <tr>
+          <td><code>coin-agents</code></td>
+          <td>TypeScript / Node.js</td>
+          <td>Agent runtime workers (market makers)</td>
+        </tr>
+        <tr>
+          <td><code>coin-prd</code></td>
+          <td>HTML / PDF</td>
+          <td>Product docs (PRD, roadmap, ADRs)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="compare-grid">
+      <div class="compare-col selected">
+        <h4>Multi-Repo (Selected for MVP)</h4>
+        <ul>
+          <li>Already set up with GitHub org, labels, issues, and project board</li>
+          <li>Independent deploy cycles per repo</li>
+          <li>Simple CI/CD &mdash; no Turborepo config needed</li>
+          <li>Clear ownership boundaries per component</li>
+          <li>Works well for a 5-person team</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <h4>Monorepo (Blueprint, evaluate at V2)</h4>
+        <ul>
+          <li>Shared types across all packages</li>
+          <li>Atomic cross-repo changes</li>
+          <li>Turborepo remote caching</li>
+          <li>Better for larger teams (10+)</li>
+          <li>Higher initial setup cost</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="adr-card">
+      <div class="adr-card-section">
+        <div class="adr-card-label">Type Sharing Strategy (Multi-Repo)</div>
+        <p style="margin-bottom: 0;">To share TypeScript types between <code>coin-web</code>, <code>coin-convex</code>, and <code>coin-agents</code> without a monorepo, publish a <code>@coin/types</code> npm package (private, on GitHub Packages) or use Git submodules for a shared <code>types/</code> directory. Decision on the exact mechanism deferred to Sprint 1.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 6. HOSTING ============ -->
+  <div class="section page-break" id="adr-hosting">
+    <h1>6. ADR-001d: Cloud Platform &amp; Hosting</h1>
+
+    <div class="adr-card">
+      <div class="adr-card-header">
+        <div class="adr-card-title">Cloud Platform &amp; Hosting</div>
+        <span class="decision-accepted">Accepted &mdash; Revised Feb 23</span>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Context</div>
+        <p style="margin-bottom: 0;">The PRD/roadmap specifies free-tier infrastructure for MVP (&lt;$50/mo) scaling to ~$4K/mo post-funding. The blueprint proposes Vercel + Fly.io + Convex Cloud + Cloudflare. Team feedback (dEXploarer) raised an important point: <strong>self-hosting Convex on Railway</strong> provides a layer of data privacy, which matters for a crypto financial product handling wallet data and trade history. Convex is now fully open-source and has a one-click Railway deploy template.</p>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Decision</div>
+        <p style="margin-bottom: 0;"><strong>MVP: Convex Cloud (zero ops, ship fast). V1: Migrate to self-hosted Convex on Railway (data sovereignty).</strong> Vercel for web, Railway for agents + Hono + self-hosted Convex, Helius for RPC. Add Cloudflare when needed for DDoS/WAF.</p>
+      </div>
+    </div>
+
+    <h3>Hosting Map</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>MVP (Free Tier)</th>
+          <th>V1 Post-Funding</th>
+          <th>Blueprint Equivalent</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Web App</strong> (coin-web)</td>
+          <td>Vercel Hobby ($0)</td>
+          <td>Vercel Pro ($20/mo)</td>
+          <td>Vercel &mdash; aligned</td>
+        </tr>
+        <tr>
+          <td><strong>Backend</strong> (coin-convex)</td>
+          <td>Convex Cloud Starter ($0)</td>
+          <td>Self-hosted Convex on Railway + Postgres (~$20&ndash;40/mo)</td>
+          <td>Convex &mdash; aligned (self-hosted for privacy)</td>
+        </tr>
+        <tr>
+          <td><strong>Agents + Hono</strong> (coin-agents)</td>
+          <td>Railway Hobby ($5/mo)</td>
+          <td>Railway Pro ($20/mo)</td>
+          <td>Blueprint uses Fly.io</td>
+        </tr>
+        <tr>
+          <td><strong>Escrow</strong> (coin-escrow)</td>
+          <td>Solana Devnet (free)</td>
+          <td>Solana Mainnet</td>
+          <td>N/A in blueprint</td>
+        </tr>
+        <tr>
+          <td><strong>RPC</strong></td>
+          <td>Helius Free (100K/day)</td>
+          <td>Helius Growth</td>
+          <td>Not specified</td>
+        </tr>
+        <tr>
+          <td><strong>CDN / WAF</strong></td>
+          <td>None (Vercel handles CDN)</td>
+          <td>Cloudflare (if needed)</td>
+          <td>Cloudflare</td>
+        </tr>
+        <tr>
+          <td><strong>Monitoring</strong></td>
+          <td>Vercel Analytics (free)</td>
+          <td>Sentry + Vercel Analytics</td>
+          <td>Sentry + Grafana + Prometheus</td>
+        </tr>
+        <tr>
+          <td><strong>CI/CD</strong></td>
+          <td>GitHub Actions (free)</td>
+          <td>GitHub Actions</td>
+          <td>GitHub Actions &mdash; aligned</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Monthly Cost Projection</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>Monthly Cost</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MVP (Weeks 1&ndash;4)</td>
+          <td><strong>&lt;$50/mo</strong></td>
+          <td>All free tiers + $50&ndash;200 one-time mainnet seed</td>
+        </tr>
+        <tr>
+          <td>V1 (Weeks 5&ndash;16)</td>
+          <td><strong>~$4,000/mo</strong></td>
+          <td>Vercel Pro, self-hosted Convex + Postgres on Railway, Helius Growth, Railway (agents + Hono)</td>
+        </tr>
+        <tr>
+          <td>V2+ (Blueprint level)</td>
+          <td><strong>$8,000&ndash;15,000/mo</strong></td>
+          <td>Fly.io microservices, Cloudflare Pro, ClickHouse, Redis, monitoring stack</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <p><strong>Why Railway over Fly.io for agents:</strong> The agent workers are long-running Node.js processes (subscribing to WebSocket feeds, posting offers). Railway's developer experience is simpler for this use case &mdash; deploy from GitHub, automatic restarts, built-in logging. Fly.io's Machines API is more powerful but adds operational complexity that isn't justified for 2&ndash;20 agent processes.</p>
+    </div>
+
+    <h3>Self-Hosted Convex Migration Plan</h3>
+
+    <div class="callout-warning callout">
+      <p><strong>Amendment (Feb 23) &mdash; based on team feedback from dEXploarer:</strong> Self-hosting Convex provides data sovereignty over user wallet data, trade history, and financial activity. For a crypto product, controlling your own data infrastructure is a meaningful privacy and security advantage &mdash; especially for enterprise and institutional users down the road.</p>
+    </div>
+
+    <p>Convex is fully open-source (FSL Apache 2.0) and supports self-hosting via Docker with SQLite or Postgres as the storage backend. Railway provides a one-click deploy template.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Convex Cloud (MVP)</th>
+          <th>Self-Hosted on Railway (V1)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Setup</strong></td>
+          <td>Zero config</td>
+          <td>Docker + Postgres (one-click Railway template)</td>
+        </tr>
+        <tr>
+          <td><strong>Scaling</strong></td>
+          <td>Automatic</td>
+          <td>Manual (single machine; scale vertically on Railway)</td>
+        </tr>
+        <tr>
+          <td><strong>High Availability</strong></td>
+          <td>Managed by Convex team</td>
+          <td>Team-managed (Railway auto-restarts + Postgres replication)</td>
+        </tr>
+        <tr>
+          <td><strong>Data Privacy</strong></td>
+          <td>Convex Cloud servers (US)</td>
+          <td>Your infrastructure &mdash; full data sovereignty</td>
+        </tr>
+        <tr>
+          <td><strong>Cost</strong></td>
+          <td>$0 (free tier) &rarr; $25/mo (Pro)</td>
+          <td>~$20&ndash;40/mo (Railway compute + Postgres)</td>
+        </tr>
+        <tr>
+          <td><strong>Backups</strong></td>
+          <td>Managed</td>
+          <td>Team-configured (Railway S3 backup template available)</td>
+        </tr>
+        <tr>
+          <td><strong>Migrations</strong></td>
+          <td>Automatic</td>
+          <td>Manual SQL migrations between versions</td>
+        </tr>
+        <tr>
+          <td><strong>Dashboard</strong></td>
+          <td>Hosted at dashboard.convex.dev</td>
+          <td>Self-hosted (open-source dashboard included)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Migration Path</h4>
+    <div class="summary-box">
+      <div class="summary-item">
+        <div class="summary-icon"><strong>1.</strong></div>
+        <div><strong>MVP (Weeks 1&ndash;4):</strong> Use Convex Cloud free tier. Zero ops, ship the demo fast.</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon"><strong>2.</strong></div>
+        <div><strong>V1 Phase 1 (Week 5):</strong> Deploy self-hosted Convex on Railway using Docker + Postgres. Migrate schema and data from Cloud.</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon"><strong>3.</strong></div>
+        <div><strong>V1 Phase 2+:</strong> Run agents, Hono server, and self-hosted Convex all on Railway. Single platform, full control.</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon"><strong>4.</strong></div>
+        <div><strong>Migration is low-risk:</strong> Same Convex API, same client libraries. Only the backend URL changes in <code>.env</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 7. ENVIRONMENTS ============ -->
+  <div class="section page-break" id="adr-environments">
+    <h1>7. ADR-001e: QA &amp; Production Environments</h1>
+
+    <div class="adr-card">
+      <div class="adr-card-header">
+        <div class="adr-card-title">QA &amp; Production Environments</div>
+        <span class="decision-accepted">Accepted</span>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Context</div>
+        <p style="margin-bottom: 0;">Neither the PRD nor the blueprint explicitly defines separate QA and production environments. For a pre-funding team of 5, we need a lightweight environment strategy that prevents shipping broken code without the overhead of a full staging infrastructure.</p>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Decision</div>
+        <p style="margin-bottom: 0;"><strong>Two-environment strategy leveraging Solana's built-in devnet/mainnet split and Vercel's preview deployments.</strong></p>
+      </div>
+    </div>
+
+    <h3>Environment Map</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Development / QA</th>
+          <th>Production</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Solana Network</strong></td>
+          <td>Devnet (free SOL, no real value)</td>
+          <td>Mainnet (real USDC, real tokens)</td>
+        </tr>
+        <tr>
+          <td><strong>Web App</strong></td>
+          <td>Vercel Preview (auto per PR)</td>
+          <td>Vercel Production (<code>main</code> branch)</td>
+        </tr>
+        <tr>
+          <td><strong>Convex Backend</strong></td>
+          <td>Convex Dev project</td>
+          <td>Convex Production project</td>
+        </tr>
+        <tr>
+          <td><strong>Agents</strong></td>
+          <td>Local / Railway Dev environment</td>
+          <td>Railway Production</td>
+        </tr>
+        <tr>
+          <td><strong>Escrow Program</strong></td>
+          <td>Deployed on Devnet</td>
+          <td>Deployed on Mainnet</td>
+        </tr>
+        <tr>
+          <td><strong>RPC</strong></td>
+          <td>Helius Devnet endpoint</td>
+          <td>Helius Mainnet endpoint</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Deployment Flow</h3>
+
+    <div class="summary-box">
+      <div class="summary-item">
+        <div class="summary-icon"><strong>1.</strong></div>
+        <div>Developer pushes feature branch &rarr; Vercel auto-generates Preview URL</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon"><strong>2.</strong></div>
+        <div>PR reviewed by at least one team member + all CI checks pass (lint, typecheck, tests)</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon"><strong>3.</strong></div>
+        <div>Merge to <code>main</code> &rarr; Vercel auto-deploys to Production + Railway deploys agents</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon"><strong>4.</strong></div>
+        <div>Escrow program upgrades: tested on Devnet first, deployed to Mainnet only after full team sign-off</div>
+      </div>
+    </div>
+
+    <div class="callout-warning callout">
+      <p><strong>V1 Upgrade (Post-Funding):</strong> Add a formal staging environment with a dedicated Convex staging project, Railway staging service, and Solana Devnet. The blueprint's canary deployment pattern (5% traffic &rarr; 25% &rarr; 50% &rarr; 100%) is good practice but overkill until we have real user traffic to split. Adopt it in V2.</p>
+    </div>
+  </div>
+
+  <!-- ============ 8. VECTOR DB ============ -->
+  <div class="section page-break" id="adr-vectordb">
+    <h1>8. ADR-001f: Vector Database</h1>
+
+    <div class="adr-card">
+      <div class="adr-card-header">
+        <div class="adr-card-title">Vector Database (Pinecone vs Qdrant)</div>
+        <span class="decision-deferred">Deferred</span>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Context</div>
+        <p style="margin-bottom: 0;">The Architecture Blueprint includes Pinecone for "AI-powered search, recommendation engine embeddings." This supports features like robo-advisory, smart transaction categorization, and fraud detection. The question was raised: should Coin use Pinecone or Qdrant?</p>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Decision</div>
+        <p style="margin-bottom: 0;"><strong>Neither. No vector database is needed for MVP or V1. Deferred to V2+.</strong></p>
+      </div>
+    </div>
+
+    <p>Coin's MVP and V1 do not include any features that require vector embeddings:</p>
+    <ul>
+      <li>No AI-powered search &mdash; token pairs are a fixed list of 14</li>
+      <li>No recommendation engine &mdash; marketplace shows all offers</li>
+      <li>No robo-advisory &mdash; users and agents trade directly</li>
+      <li>No fraud detection ML &mdash; escrow program + spending limits handle safety</li>
+      <li>No smart categorization &mdash; all trades are token-for-USDC</li>
+    </ul>
+
+    <h3>If/When We Need One</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th>Type</th>
+          <th>Pros</th>
+          <th>Cons</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Convex Vector Search</strong></td>
+          <td>Built-in</td>
+          <td>Zero additional infrastructure, already in our stack, type-safe</td>
+          <td>Less mature than dedicated vector DBs, limited tuning options</td>
+        </tr>
+        <tr>
+          <td><strong>Pinecone</strong></td>
+          <td>Managed SaaS</td>
+          <td>Zero ops, fast, widely adopted, free tier available</td>
+          <td>Vendor lock-in, cost scales with vector count</td>
+        </tr>
+        <tr>
+          <td><strong>Qdrant</strong></td>
+          <td>Self-hosted or Cloud</td>
+          <td>Open source, more control, cheaper at scale</td>
+          <td>Requires ops/hosting, smaller ecosystem</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout-success callout">
+      <p><strong>Recommendation for V2+:</strong> Try Convex's built-in vector search first. It's already in the stack and eliminates an additional service. If the use case outgrows it (millions of embeddings, advanced filtering), migrate to Pinecone for managed simplicity.</p>
+    </div>
+  </div>
+
+  <!-- ============ 9. STATE MANAGEMENT ============ -->
+  <div class="section page-break" id="adr-state">
+    <h1>9. ADR-001g: State Management &amp; Patterns</h1>
+
+    <div class="adr-card">
+      <div class="adr-card-header">
+        <div class="adr-card-title">State Management &amp; Development Patterns</div>
+        <span class="decision-accepted">Accepted</span>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Context</div>
+        <p style="margin-bottom: 0;">The Architecture Blueprint recommends several development patterns that are independent of the product scope. These are good engineering practices that apply regardless of whether Coin is a P2P exchange or a fintech super-app.</p>
+      </div>
+
+      <div class="adr-card-section">
+        <div class="adr-card-label">Decision</div>
+        <p style="margin-bottom: 0;"><strong>Adopt the following patterns from the Architecture Blueprint:</strong></p>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Pattern</th>
+          <th>Blueprint Recommendation</th>
+          <th>Coin Adoption</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Client State</strong></td>
+          <td>Zustand + Convex reactive queries</td>
+          <td>Adopt &mdash; Zustand for UI state, Convex for server state</td>
+        </tr>
+        <tr>
+          <td><strong>Validation</strong></td>
+          <td>Zod schemas on every boundary</td>
+          <td>Adopt &mdash; shared Zod schemas for forms, API, and Convex</td>
+        </tr>
+        <tr>
+          <td><strong>Forms</strong></td>
+          <td>React Hook Form + Zod</td>
+          <td>Adopt &mdash; for offer creation, trade preferences, settings</td>
+        </tr>
+        <tr>
+          <td><strong>Styling</strong></td>
+          <td>Tailwind CSS 4 + shadcn/ui</td>
+          <td>Adopt &mdash; consistent with PRD wireframes</td>
+        </tr>
+        <tr>
+          <td><strong>Convex Organization</strong></td>
+          <td>queries.ts / mutations.ts / actions.ts per domain</td>
+          <td>Adopt &mdash; clean separation for coin-convex</td>
+        </tr>
+        <tr>
+          <td><strong>Feature Modules</strong></td>
+          <td>Vertical slices (components, hooks, actions, stores)</td>
+          <td>Adopt &mdash; for marketplace, wallet, agent features in coin-web</td>
+        </tr>
+        <tr>
+          <td><strong>Component Hierarchy</strong></td>
+          <td>Primitives &rarr; Composites &rarr; Features &rarr; Pages</td>
+          <td>Adopt &mdash; design system structure for coin-web</td>
+        </tr>
+        <tr>
+          <td><strong>Error Boundaries</strong></td>
+          <td>App &rarr; Layout &rarr; Feature &rarr; Component</td>
+          <td>Adopt &mdash; graceful degradation at each level</td>
+        </tr>
+        <tr>
+          <td><strong>Optimistic Updates</strong></td>
+          <td>Convex built-in optimistic update support</td>
+          <td>Adopt &mdash; instant feedback for offer creation/acceptance</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <p><strong>Not adopted from the blueprint:</strong> LaunchDarkly feature flags (overkill for 5-person team &mdash; use environment variables), ClickHouse analytics DB (no analytics workload yet), Redis/Upstash cache (Convex handles caching), Pulumi IaC (3 services don't need infrastructure-as-code), Infisical secrets (use environment variables + Vercel/Railway secret management).</p>
+    </div>
+  </div>
+
+  <!-- ============ 10. ALIGNMENT ============ -->
+  <div class="section page-break" id="alignment">
+    <h1>10. Blueprint vs PRD/Roadmap &mdash; Full Alignment Matrix</h1>
+
+    <p>This table compares every major dimension of the Architecture Blueprint against what the PRD and Roadmap define for Coin. Where they conflict, the decision column records which direction we're going.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>PRD / Roadmap</th>
+          <th>Architecture Blueprint</th>
+          <th>Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Product Scope</strong></td>
+          <td>P2P token exchange on Solana</td>
+          <td>Fintech super-app (banking, cards, investments, payments, rewards, social)</td>
+          <td><span class="sev-high">PRD scope for MVP/V1</span></td>
+        </tr>
+        <tr>
+          <td><strong>Auth</strong></td>
+          <td>Privy</td>
+          <td>Clerk</td>
+          <td><span class="sev-high">Privy (ADR-001a)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Backend</strong></td>
+          <td>Convex</td>
+          <td>Convex + 6 Hono microservices</td>
+          <td><span class="sev-med">Convex (data) + Hono (compute) (ADR-001b revised)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Repo Structure</strong></td>
+          <td>5 separate repos</td>
+          <td>Turborepo monorepo</td>
+          <td><span class="sev-med">Multi-repo (ADR-001c)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Web Framework</strong></td>
+          <td>Next.js + Tailwind</td>
+          <td>Next.js 15 + Tailwind 4 + shadcn/ui</td>
+          <td><span class="sev-low">Aligned &mdash; adopt shadcn/ui</span></td>
+        </tr>
+        <tr>
+          <td><strong>Mobile</strong></td>
+          <td>Not in MVP; V2 React Native</td>
+          <td>React Native + Expo from Phase 0</td>
+          <td><span class="sev-med">Defer to V2 per PRD</span></td>
+        </tr>
+        <tr>
+          <td><strong>Hosting</strong></td>
+          <td>Vercel + Railway</td>
+          <td>Vercel + Fly.io + Convex Cloud</td>
+          <td><span class="sev-med">Vercel + Railway + self-hosted Convex (ADR-001d revised)</span></td>
+        </tr>
+        <tr>
+          <td><strong>State Management</strong></td>
+          <td>Not specified</td>
+          <td>Zustand + Convex</td>
+          <td><span class="sev-low">Adopt (ADR-001g)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Blockchain</strong></td>
+          <td>Solana (Anchor escrow, Jupiter feeds)</td>
+          <td>Multi-chain (Ethereum, Bitcoin, Solana, Polygon, etc.)</td>
+          <td><span class="sev-high">Solana only for MVP/V1</span></td>
+        </tr>
+        <tr>
+          <td><strong>Trade Settlement</strong></td>
+          <td>On-chain escrow (Anchor/Rust)</td>
+          <td>Not defined (generic "crypto trading")</td>
+          <td><span class="sev-high">PRD escrow model</span></td>
+        </tr>
+        <tr>
+          <td><strong>AI Agents</strong></td>
+          <td>Core concept &mdash; market-making agents</td>
+          <td>Not mentioned</td>
+          <td><span class="sev-high">PRD agent model</span></td>
+        </tr>
+        <tr>
+          <td><strong>Token List</strong></td>
+          <td>14 Solana tokens vs USDC</td>
+          <td>Generic multi-chain crypto</td>
+          <td><span class="sev-high">PRD token list</span></td>
+        </tr>
+        <tr>
+          <td><strong>Vector DB</strong></td>
+          <td>Not mentioned</td>
+          <td>Pinecone</td>
+          <td><span class="sev-low">Deferred (ADR-001f)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Validation</strong></td>
+          <td>Implied</td>
+          <td>Zod everywhere</td>
+          <td><span class="sev-low">Adopt Zod (ADR-001g)</span></td>
+        </tr>
+        <tr>
+          <td><strong>KYC/AML</strong></td>
+          <td>Geo-blocking only for V1</td>
+          <td>Full compliance engine (Jumio, Onfido, Chainalysis)</td>
+          <td><span class="sev-med">Geo-blocking for V1, full KYC in V3+</span></td>
+        </tr>
+        <tr>
+          <td><strong>Build Timeline</strong></td>
+          <td>4-week MVP + 12-week V1</td>
+          <td>24-week full build (Phases 0&ndash;5)</td>
+          <td><span class="sev-high">PRD timeline</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <p><strong>Key Takeaway:</strong> The Architecture Blueprint is a valuable <em>north-star vision</em> document. It describes where Coin <em>could</em> go. But for MVP and V1, we build what the PRD defines &mdash; a focused P2P exchange &mdash; using the engineering patterns and practices from the blueprint. Scope follows the PRD; engineering quality follows the blueprint.</p>
+    </div>
+  </div>
+
+  <!-- ============ 11. ADOPTED PATTERNS ============ -->
+  <div class="section page-break" id="adopted">
+    <h1>11. Patterns Adopted from the Blueprint</h1>
+
+    <p>While the blueprint's product scope goes beyond MVP, several of its engineering recommendations are strong and should be adopted immediately. These patterns improve code quality and set up a clean foundation that scales.</p>
+
+    <h3>Convex Function Organization</h3>
+    <p>Organize <code>coin-convex</code> by domain, with separate files for queries, mutations, and actions:</p>
+    <div class="summary-box" style="font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 2;">
+      convex/<br>
+      &nbsp;&nbsp;functions/<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;offers/queries.ts &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #6B7280;"># getOffers, getOffersByToken, getMyOffers</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;offers/mutations.ts &nbsp;&nbsp;<span style="color: #6B7280;"># createOffer, cancelOffer, acceptOffer</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;offers/actions.ts &nbsp;&nbsp;&nbsp;<span style="color: #6B7280;"># settleOnChain, syncEscrowStatus</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;agents/queries.ts &nbsp;&nbsp;&nbsp;<span style="color: #6B7280;"># getAgents, getAgentPerformance</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;agents/mutations.ts &nbsp;<span style="color: #6B7280;"># registerAgent, updateConfig</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;prices/queries.ts &nbsp;&nbsp;&nbsp;<span style="color: #6B7280;"># getLatestPrices, getPriceHistory</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;prices/mutations.ts &nbsp;<span style="color: #6B7280;"># updatePrice</span><br>
+      &nbsp;&nbsp;schema.ts<br>
+      &nbsp;&nbsp;crons.ts<br>
+      &nbsp;&nbsp;http.ts
+    </div>
+
+    <h3>Feature Module Pattern for coin-web</h3>
+    <p>Each feature in the web app follows the vertical slice pattern:</p>
+    <div class="summary-box" style="font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 2;">
+      features/<br>
+      &nbsp;&nbsp;marketplace/<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;components/ &nbsp;&nbsp;&nbsp;<span style="color: #6B7280;"># OfferCard, OfferTable, BuySellToggle</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;hooks/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #6B7280;"># useOffers, useMarketPrice</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;stores/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #6B7280;"># marketplaceStore (Zustand)</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;validators/ &nbsp;&nbsp;<span style="color: #6B7280;"># offerSchema (Zod)</span><br>
+      &nbsp;&nbsp;wallet/<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;components/ &nbsp;&nbsp;&nbsp;<span style="color: #6B7280;"># WalletBalance, TokenList, DepositFlow</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;hooks/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #6B7280;"># useWallet, useBalance</span><br>
+      &nbsp;&nbsp;agent/<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;components/ &nbsp;&nbsp;&nbsp;<span style="color: #6B7280;"># AgentStatus, AgentConfig, AgentPnL</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;hooks/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #6B7280;"># useAgent, useAgentMetrics</span>
+    </div>
+
+    <h3>Design System Hierarchy</h3>
+    <p>Build the <code>coin-web</code> component library in layers, using shadcn/ui as the primitive foundation:</p>
+    <div class="summary-box">
+      <div class="summary-item">
+        <div class="summary-icon"><strong>L1</strong></div>
+        <div><strong>Primitives</strong> (shadcn/ui) &mdash; Button, Input, Select, Dialog, Badge, Skeleton, Card</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon"><strong>L2</strong></div>
+        <div><strong>Composites</strong> &mdash; PriceDisplay, TokenSelector, OfferRow, SpreadBadge, WalletCard</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon"><strong>L3</strong></div>
+        <div><strong>Features</strong> &mdash; MarketplaceFeed, OfferCreator, AgentDashboard, TradeHistory</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon"><strong>L4</strong></div>
+        <div><strong>Pages</strong> &mdash; BuyersMarket, SellersMarket, WalletView, AgentConfig, Settings</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 12. NEXT STEPS ============ -->
+  <div class="section page-break" id="next-steps">
+    <h1>12. Next Steps</h1>
+
+    <p>This ADR is proposed and pending team review. The following actions are needed to finalize it.</p>
+
+    <h3>Immediate (This Week)</h3>
+    <ol>
+      <li><strong>Team Review:</strong> All 5 partners review this document and flag disagreements in Discord.</li>
+      <li><strong>Decision Lock:</strong> Any unresolved conflicts are discussed in a team call. Once consensus is reached, the status of this ADR moves from <span class="decision-open">Proposed</span> to <span class="decision-accepted">Accepted</span>.</li>
+      <li><strong>Begin MVP Sprint 1:</strong> With architecture aligned, development starts per the roadmap's Week 1 plan (Anchor escrow program + Convex schema + Jupiter price integration).</li>
+    </ol>
+
+    <h3>Before V1 Kickoff (Post-Funding)</h3>
+    <ol>
+      <li><strong>ADR-002:</strong> Wallet provider spike &mdash; confirm Privy embedded wallets vs alternatives.</li>
+      <li><strong>ADR-003:</strong> Type sharing strategy &mdash; npm package vs Git submodules vs monorepo migration.</li>
+      <li><strong>ADR-004:</strong> Formal staging environment setup + CI/CD pipeline definition.</li>
+    </ol>
+
+    <h3>Decision Review Cadence</h3>
+    <p>Architecture decisions are living documents. Each ADR will be reviewed at phase boundaries (end of MVP, end of V1 Phase 1, etc.) and updated if the technical landscape has changed. The Architecture Blueprint remains a reference for long-term direction &mdash; decisions deferred today may be revisited as the product grows.</p>
+
+    <hr>
+
+    <div class="callout">
+      <p><strong>Questions?</strong> Drop them in <code>#dev-architecture</code> on Discord. Tag @wes or @dEXploarer for technical clarifications.</p>
+    </div>
+
+    <hr>
+
+    <p style="text-align: center; color: #6B7280; font-size: 13px; margin-top: 48px;">
+      Coin &mdash; Architecture Decision Record ADR-001<br>
+      February 22, 2026 &mdash; Confidential<br>
+      coin.family
+    </p>
+  </div>
+
+</div>
+
+</body>
+</html>
